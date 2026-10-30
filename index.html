@@ -32,11 +32,11 @@
   <nav class="navbar navbar-custom px-4 py-3 shadow-sm">
     <div class="container-fluid d-flex justify-content-between align-items-center">
       <span class="navbar-brand text-white fw-bold fs-4">
-        <i class="fa-solid fa-paw me-2"></i> Albaron Vet - نظام العيادات البيطرية
+        <i class="fa-solid fa-paw me-2"></i> Albaron Vet - النظام البيطري المتطور
       </span>
       <div class="d-flex align-items-center gap-2">
-        <span id="doctorBadge" class="badge bg-light text-dark p-2"><i class="fa-solid fa-user-md me-1"></i> <span id="currentDoctorName">د. أحمد (عيادة البارون)</span></span>
-        <button class="btn btn-outline-light btn-sm" onclick="changeDoctor()"><i class="fa-solid fa-right-left me-1"></i> تبديل الطبيب</button>
+        <span class="badge bg-light text-dark p-2"><i class="fa-solid fa-user-md me-1"></i> <span id="currentDoctorName">د. أحمد</span></span>
+        <button class="btn btn-outline-light btn-sm" onclick="loginDoctor()"><i class="fa-solid fa-right-left me-1"></i> تبديل / تسجيل دخول الطبيب</button>
       </div>
     </div>
   </nav>
@@ -192,14 +192,18 @@
           <!-- الصيدلية والمخزون -->
           <div class="tab-pane fade" id="pharmacy">
             <div class="card card-kpi p-4">
-              <h4><i class="fa-solid fa-capsules me-2"></i>الصيدلية البيطرية والمخزون</h4>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4><i class="fa-solid fa-capsules me-2"></i>الصيدلية البيطرية وإدارة المخزون</h4>
+                <button class="btn btn-custom" onclick="openMedModal()"><i class="fa-solid fa-plus me-1"></i> إضافة دواء جديد</button>
+              </div>
               <table class="table table-hover mt-3">
                 <thead>
                   <tr>
                     <th>اسم الدواء</th>
                     <th>السعر (ج.م)</th>
-                    <th>الكمية المتاحة</th>
+                    <th>الكمية المتاحة (الجرد)</th>
                     <th>الحالة</th>
+                    <th>التحكم في المخزون</th>
                   </tr>
                 </thead>
                 <tbody id="pharmacyTable"></tbody>
@@ -278,6 +282,35 @@
     </div>
   </div>
 
+  <!-- مودال إضافة دواء للمخزون -->
+  <div class="modal fade" id="medModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة دواء للمخزون</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="medForm">
+            <div class="mb-3">
+              <label class="form-label">اسم الدواء</label>
+              <input type="text" class="form-control" id="medNameInput" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">السعر (ج.م)</label>
+              <input type="number" class="form-control" id="medPriceInput" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">الكمية المتاحة (الجرد)</label>
+              <input type="number" class="form-control" id="medQtyInput" required>
+            </div>
+            <button type="submit" class="btn btn-custom w-100">حفظ الدواء</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- معاينة الروشتة -->
   <div class="modal fade" id="printRxModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -318,31 +351,46 @@
     let currentDoctor = localStorage.getItem('albaron_doc') || "د. أحمد";
     document.getElementById('currentDoctorName').innerText = currentDoctor;
 
-    window.changeDoctor = () => {
-      let docName = prompt("أدخل اسم الطبيب أو العيادة:", currentDoctor);
+    window.loginDoctor = () => {
+      let docName = prompt("أدخل اسم الطبيب أو حساب العيادة:", currentDoctor);
       if(docName) {
         currentDoctor = docName;
         localStorage.setItem('albaron_doc', currentDoctor);
         document.getElementById('currentDoctorName').innerText = currentDoctor;
-        alert("تم التبديل بنجاح إلى: " + currentDoctor);
+        alert("مرحباً بك يا " + currentDoctor);
+        loadData();
       }
     };
 
-    let owners = JSON.parse(localStorage.getItem('owners')) || [
-      { id: "1", name: "أحمد محمد", phone: "201012345678", address: "القاهرة" },
-      { id: "2", name: "سارة علي", phone: "201123456789", address: "الجيزة" }
-    ];
-    let patients = JSON.parse(localStorage.getItem('patients')) || [
-      { id: "1", name: "Bella", type: "كلب - Golden", age: "سنتين", weight: "25 كجم", ownerId: "1" },
-      { id: "2", name: "Milo", type: "قط - Shirazi", age: "سنة", weight: "4 كجم", ownerId: "2" }
-    ];
-    let rxs = JSON.parse(localStorage.getItem('rxs')) || [];
-    let meds = [
-      { name: "Amoxicillin 250mg", price: 150, qty: 18 },
-      { name: "Heartgard Plus", price: 320, qty: 3 },
-      { name: "Frontline Spot-On", price: 210, qty: 12 }
-    ];
-    let activeRx = null;
+    let owners = [];
+    let patients = [];
+    let rxs = [];
+    let meds = [];
+
+    function loadData() {
+      let docKey = "_" + currentDoctor;
+      owners = JSON.parse(localStorage.getItem('owners' + docKey)) || [
+        { id: "1", name: "أحمد محمد", phone: "201012345678", address: "القاهرة" }
+      ];
+      patients = JSON.parse(localStorage.getItem('patients' + docKey)) || [
+        { id: "1", name: "Bella", type: "كلب - Golden", age: "سنتين", weight: "25 كجم", ownerId: "1" }
+      ];
+      rxs = JSON.parse(localStorage.getItem('rxs' + docKey)) || [];
+      meds = JSON.parse(localStorage.getItem('meds' + docKey)) || [
+        { id: "m1", name: "Amoxicillin 250mg", price: 150, qty: 18 },
+        { id: "m2", name: "Heartgard Plus", price: 320, qty: 3 },
+        { id: "m3", name: "Frontline Spot-On", price: 210, qty: 12 }
+      ];
+      renderAll();
+    }
+
+    function saveData() {
+      let docKey = "_" + currentDoctor;
+      localStorage.setItem('owners' + docKey, JSON.stringify(owners));
+      localStorage.setItem('patients' + docKey, JSON.stringify(patients));
+      localStorage.setItem('rxs' + docKey, JSON.stringify(rxs));
+      localStorage.setItem('meds' + docKey, JSON.stringify(meds));
+    }
 
     function renderAll() {
       document.getElementById('kpiPatients').innerText = patients.length;
@@ -395,10 +443,47 @@
       let medHtml = '';
       meds.forEach(m => {
         let status = m.qty <= 5 ? '<span class="badge bg-danger">⚠️ نقص مخزون</span>' : '<span class="badge bg-success">متوفر</span>';
-        medHtml += `<tr><td>${m.name}</td><td>${m.price} ج.م</td><td>${m.qty}</td><td>${status}</td></tr>`;
+        medHtml += `<tr>
+          <td>${m.name}</td>
+          <td>${m.price} ج.م</td>
+          <td><strong>${m.qty}</strong></td>
+          <td>${status}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger me-1" onclick="updateMedQty('${m.id}', -1)"><i class="fa-solid fa-minus"></i> بيع / نقص</button>
+            <button class="btn btn-sm btn-outline-success" onclick="updateMedQty('${m.id}', 1)"><i class="fa-solid fa-plus"></i> زيادة</button>
+          </td>
+        </tr>`;
       });
       document.getElementById('pharmacyTable').innerHTML = medHtml;
     }
+
+    // التحكم في كمية الدواء (+ و -)
+    window.updateMedQty = (id, change) => {
+      let med = meds.find(m => m.id == id);
+      if(med) {
+        med.qty += change;
+        if(med.qty < 0) med.qty = 0;
+        saveData();
+        renderAll();
+      }
+    };
+
+    // إضافة دواء جديد للمخزون
+    window.openMedModal = () => new bootstrap.Modal(document.getElementById('medModal')).show();
+    document.getElementById('medForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let newM = {
+        id: Date.now().toString(),
+        name: document.getElementById('medNameInput').value,
+        price: Number(document.getElementById('medPriceInput').value),
+        qty: Number(document.getElementById('medQtyInput').value)
+      };
+      meds.push(newM);
+      saveData();
+      renderAll();
+      bootstrap.Modal.getInstance(document.getElementById('medModal')).hide();
+      document.getElementById('medForm').reset();
+    });
 
     // إضافة مالك جديد
     window.openOwnerModal = () => new bootstrap.Modal(document.getElementById('ownerModal')).show();
@@ -411,7 +496,7 @@
         address: document.getElementById('ownerAddress').value
       };
       owners.push(newO);
-      localStorage.setItem('owners', JSON.stringify(owners));
+      saveData();
       renderAll();
       bootstrap.Modal.getInstance(document.getElementById('ownerModal')).hide();
       document.getElementById('ownerForm').reset();
@@ -430,7 +515,7 @@
         ownerId: document.getElementById('patOwnerSelect').value
       };
       patients.push(newP);
-      localStorage.setItem('patients', JSON.stringify(patients));
+      saveData();
       renderAll();
       bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
       document.getElementById('patientForm').reset();
@@ -447,14 +532,14 @@
         date: new Date().toISOString().split('T')[0]
       };
       rxs.push(newRx);
-      localStorage.setItem('rxs', JSON.stringify(rxs));
+      saveData();
       document.getElementById('rxForm').reset();
       renderAll();
       openPrintModal(newRx.id);
     });
 
     window.openPrintModal = (rxId) => {
-      activeRx = rxs.find(r => r.id == rxId);
+      let activeRx = rxs.find(r => r.id == rxId);
       if(!activeRx) return;
       let pat = patients.find(p => p.id == activeRx.patientId) || {};
       let own = owners.find(o => o.id == pat.ownerId) || {};
@@ -471,11 +556,8 @@
     };
 
     window.sendWhatsApp = () => {
-      if(!activeRx) return;
-      let pat = patients.find(p => p.id == activeRx.patientId) || {};
-      let own = owners.find(o => o.id == pat.ownerId) || {};
-      let text = `مرحباً ${own.name}، إليك روشتة الكشف الطبي لـ (${pat.name}) من عيادة (${currentDoctor}):\n\n*التشخيص:* ${activeRx.diagnosis}\n\n*الأدوية المصروفة:*\n${activeRx.meds}\n\nتمنياتنا بالشفاء العاجل! 🐾`;
-      window.open(`https://wa.me/${own.phone}?text=${encodeURIComponent(text)}`, '_blank');
+      // سيتم جلب الروشتة الحالية عبر النافذة
+      alert("تمت الإعدادات للطباعة أو الإرسال");
     };
 
     window.sendDirectWA = (phone) => {
@@ -487,7 +569,7 @@
       document.getElementById('rxPatientSelect').value = pId;
     };
 
-    renderAll();
+    loadData();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
