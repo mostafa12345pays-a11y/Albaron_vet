@@ -10,7 +10,6 @@
     :root {
       --primary: #005b66;
       --primary-dark: #003d45;
-      --accent: #008b8b;
       --bg: #f4f8f8;
     }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); }
@@ -33,12 +32,11 @@
   <nav class="navbar navbar-custom px-4 py-3 shadow-sm">
     <div class="container-fluid d-flex justify-content-between align-items-center">
       <span class="navbar-brand text-white fw-bold fs-4">
-        <i class="fa-solid fa-paw me-2"></i> Albaron Vet - النظام السحابي للعيادات
+        <i class="fa-solid fa-paw me-2"></i> Albaron Vet - نظام العيادات البيطرية
       </span>
-      <div id="authSection" class="d-flex align-items-center gap-3">
-        <span id="userEmailBadge" class="badge bg-light text-dark p-2" style="display:none;"><i class="fa-solid fa-user-md me-1"></i> <span id="currentUserEmail"></span></span>
-        <button id="authBtn" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#authModal"><i class="fa-solid fa-sign-in-alt me-1"></i> تسجيل دخول الطبيب</button>
-        <button id="logoutBtn" class="btn btn-danger btn-sm" style="display:none;" onclick="logoutUser()">تسجيل خروج</button>
+      <div class="d-flex align-items-center gap-2">
+        <span id="doctorBadge" class="badge bg-light text-dark p-2"><i class="fa-solid fa-user-md me-1"></i> <span id="currentDoctorName">د. أحمد (عيادة البارون)</span></span>
+        <button class="btn btn-outline-light btn-sm" onclick="changeDoctor()"><i class="fa-solid fa-right-left me-1"></i> تبديل الطبيب</button>
       </div>
     </div>
   </nav>
@@ -280,34 +278,6 @@
     </div>
   </div>
 
-  <!-- مودال تسجيل الدخول للأطباء -->
-  <div class="modal fade" id="authModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">تسجيل دخول أو إنشاء حساب طبيب</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="authForm">
-            <div class="mb-3">
-              <label class="form-label">البريد الإلكتروني</label>
-              <input type="email5" class="form-control" id="authEmail" placeholder="doctor@albaronvet.com" required style="direction: ltr;">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">كلمة المرور</label>
-              <input type="password" class="form-control" id="authPassword" required style="direction: ltr;">
-            </div>
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-custom w-50" onclick="loginUser()">تسجيل الدخول</button>
-              <button type="button" class="btn btn-outline-dark w-50" onclick="registerUser()">إنشاء حساب جديد</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- معاينة الروشتة -->
   <div class="modal fade" id="printRxModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -319,7 +289,7 @@
         <div class="modal-body" id="printableArea">
           <div class="text-center border-bottom pb-3 mb-3">
             <h2 style="color: var(--primary);">عيادة البارون البيطرية - Albaron Vet</h2>
-            <p class="mb-0">نظام إدارة العيادات البيطرية المتطور</p>
+            <p class="mb-0" id="printDoctorName">إشراف: د. أحمد</p>
           </div>
           <div class="row mb-3">
             <div class="col-6"><strong>اسم الحالة:</strong> <span id="pRxPatient"></span></div>
@@ -344,114 +314,35 @@
     </div>
   </div>
 
-  <!-- Firebase Scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <script>
+    let currentDoctor = localStorage.getItem('albaron_doc') || "د. أحمد";
+    document.getElementById('currentDoctorName').innerText = currentDoctor;
 
-    // إعدادات الـ Firebase (يمكنك استبدالها ببيانات مشروعك الخاصة لاحقاً)
-    const firebaseConfig = {
-      apiKey: "AIzaSyDummyKeyForAlbaronVet",
-      authDomain: "albaron-vet.firebaseapp.com",
-      projectId: "albaron-vet",
-      storageBucket: "albaron-vet.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:abcdef"
+    window.changeDoctor = () => {
+      let docName = prompt("أدخل اسم الطبيب أو العيادة:", currentDoctor);
+      if(docName) {
+        currentDoctor = docName;
+        localStorage.setItem('albaron_doc', currentDoctor);
+        document.getElementById('currentDoctorName').innerText = currentDoctor;
+        alert("تم التبديل بنجاح إلى: " + currentDoctor);
+      }
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let owners = [];
-    let patients = [];
-    let rxs = [];
+    let owners = JSON.parse(localStorage.getItem('owners')) || [
+      { id: "1", name: "أحمد محمد", phone: "201012345678", address: "القاهرة" },
+      { id: "2", name: "سارة علي", phone: "201123456789", address: "الجيزة" }
+    ];
+    let patients = JSON.parse(localStorage.getItem('patients')) || [
+      { id: "1", name: "Bella", type: "كلب - Golden", age: "سنتين", weight: "25 كجم", ownerId: "1" },
+      { id: "2", name: "Milo", type: "قط - Shirazi", age: "سنة", weight: "4 كجم", ownerId: "2" }
+    ];
+    let rxs = JSON.parse(localStorage.getItem('rxs')) || [];
     let meds = [
       { name: "Amoxicillin 250mg", price: 150, qty: 18 },
       { name: "Heartgard Plus", price: 320, qty: 3 },
       { name: "Frontline Spot-On", price: 210, qty: 12 }
     ];
     let activeRx = null;
-    let currentUser = null;
-
-    // مراقبة حالة تسجيل الدخول
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('currentUserEmail').innerText = user.email;
-        document.getElementById('userEmailBadge').style.display = 'inline-block';
-        document.getElementById('authBtn').style.display = 'none';
-        document.getElementById('logoutBtn').style.display = 'inline-block';
-        await loadDataFromCloud();
-      } else {
-        currentUser = null;
-        document.getElementById('userEmailBadge').style.display = 'none';
-        document.getElementById('authBtn').style.display = 'inline-block';
-        document.getElementById('logoutBtn').style.display = 'none';
-        // استخدام LocalStorage كبديل مؤقت إذا لم يسجل الدخول
-        loadLocalFallback();
-      }
-    });
-
-    window.loginUser = async () => {
-      let email = document.getElementById('authEmail').value;
-      let pass = document.getElementById('authPassword').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-        alert("تم تسجيل الدخول بنجاح!");
-      } catch (e) {
-        alert("خطأ في تسجيل الدخول: " + e.message);
-      }
-    };
-
-    window.registerUser = async () => {
-      let email = document.getElementById('authEmail').value;
-      let pass = document.getElementById('authPassword').value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-        bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
-        alert("تم إنشاء حساب الطبيب وتسجيل الدخول بنجاح!");
-      } catch (e) {
-        alert("خطأ في إنشاء الحساب: " + e.message);
-      }
-    };
-
-    window.logoutUser = async () => {
-      await signOut(auth);
-      alert("تم تسجيل الخروج");
-      location.reload();
-    };
-
-    async function loadDataFromCloud() {
-      if(!currentUser) return;
-      try {
-        // جلب الملاك
-        let oSnap = await getDocs(query(collection(db, "owners"), where("uid", "==", currentUser.uid)));
-        owners = oSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // جلب الحالات
-        let pSnap = await getDocs(query(collection(db, "patients"), where("uid", "==", currentUser.uid)));
-        patients = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // جلب الروشتات
-        let rSnap = await getDocs(query(collection(db, "rxs"), where("uid", "==", currentUser.uid)));
-        rxs = rSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        renderAll();
-      } catch(err) {
-        console.log("استخدام التخزين المحلي المؤقت لعدم اكتمال ربط قاعدة البيانات السحابية الحية:", err);
-        loadLocalFallback();
-      }
-    }
-
-    function loadLocalFallback() {
-      owners = JSON.parse(localStorage.getItem('owners')) || [{ id: "1", name: "أحمد محمد", phone: "201012345678", address: "القاهرة" }];
-      patients = JSON.parse(localStorage.getItem('patients')) || [{ id: "1", name: "Bella", type: "كلب - Golden", age: "سنتين", weight: "25 كجم", ownerId: "1" }];
-      rxs = JSON.parse(localStorage.getItem('rxs')) || [];
-      renderAll();
-    }
 
     function renderAll() {
       document.getElementById('kpiPatients').innerText = patients.length;
@@ -511,72 +402,52 @@
 
     // إضافة مالك جديد
     window.openOwnerModal = () => new bootstrap.Modal(document.getElementById('ownerModal')).show();
-    document.getElementById('ownerForm').addEventListener('submit', async (e) => {
+    document.getElementById('ownerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let newO = {
+        id: Date.now().toString(),
         name: document.getElementById('ownerName').value,
         phone: document.getElementById('ownerPhone').value,
-        address: document.getElementById('ownerAddress').value,
-        uid: currentUser ? currentUser.uid : "local"
+        address: document.getElementById('ownerAddress').value
       };
-      if (currentUser) {
-        await addDoc(collection(db, "owners"), newO);
-        await loadDataFromCloud();
-      } else {
-        newO.id = Date.now().toString();
-        owners.push(newO);
-        localStorage.setItem('owners', JSON.stringify(owners));
-        renderAll();
-      }
+      owners.push(newO);
+      localStorage.setItem('owners', JSON.stringify(owners));
+      renderAll();
       bootstrap.Modal.getInstance(document.getElementById('ownerModal')).hide();
       document.getElementById('ownerForm').reset();
     });
 
     // إضافة حيوان جديد
     window.openPatientModal = () => new bootstrap.Modal(document.getElementById('patientModal')).show();
-    document.getElementById('patientForm').addEventListener('submit', async (e) => {
+    document.getElementById('patientForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let newP = {
+        id: Date.now().toString(),
         name: document.getElementById('patName').value,
         type: document.getElementById('patType').value,
         age: document.getElementById('patAge').value,
         weight: document.getElementById('patWeight').value,
-        ownerId: document.getElementById('patOwnerSelect').value,
-        uid: currentUser ? currentUser.uid : "local"
+        ownerId: document.getElementById('patOwnerSelect').value
       };
-      if (currentUser) {
-        await addDoc(collection(db, "patients"), newP);
-        await loadDataFromCloud();
-      } else {
-        newP.id = Date.now().toString();
-        patients.push(newP);
-        localStorage.setItem('patients', JSON.stringify(patients));
-        renderAll();
-      }
+      patients.push(newP);
+      localStorage.setItem('patients', JSON.stringify(patients));
+      renderAll();
       bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
       document.getElementById('patientForm').reset();
     });
 
     // حفظ الروشتة
-    document.getElementById('rxForm').addEventListener('submit', async (e) => {
+    document.getElementById('rxForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let newRx = {
+        id: Date.now().toString(),
         patientId: document.getElementById('rxPatientSelect').value,
         diagnosis: document.getElementById('rxDiagnosis').value,
         meds: document.getElementById('rxMeds').value,
-        date: new Date().toISOString().split('T')[0],
-        uid: currentUser ? currentUser.uid : "local"
+        date: new Date().toISOString().split('T')[0]
       };
-
-      if (currentUser) {
-        let docRef = await addDoc(collection(db, "rxs"), newRx);
-        newRx.id = docRef.id;
-        rxs.push(newRx);
-      } else {
-        newRx.id = Date.now().toString();
-        rxs.push(newRx);
-        localStorage.setItem('rxs', JSON.stringify(rxs));
-      }
+      rxs.push(newRx);
+      localStorage.setItem('rxs', JSON.stringify(rxs));
       document.getElementById('rxForm').reset();
       renderAll();
       openPrintModal(newRx.id);
@@ -588,6 +459,7 @@
       let pat = patients.find(p => p.id == activeRx.patientId) || {};
       let own = owners.find(o => o.id == pat.ownerId) || {};
 
+      document.getElementById('printDoctorName').innerText = "إشراف: " + currentDoctor;
       document.getElementById('pRxPatient').innerText = pat.name || '';
       document.getElementById('pRxOwner').innerText = own.name || '';
       document.getElementById('pRxDate').innerText = activeRx.date || 'اليوم';
@@ -602,7 +474,7 @@
       if(!activeRx) return;
       let pat = patients.find(p => p.id == activeRx.patientId) || {};
       let own = owners.find(o => o.id == pat.ownerId) || {};
-      let text = `مرحباً ${own.name}، إليك روشتة الكشف الطبي لـ (${pat.name}) من عيادة Albaron Vet:\n\n*التشخيص:* ${activeRx.diagnosis}\n\n*الأدوية المصروفة:*\n${activeRx.meds}\n\nتمنياتنا بالشفاء العاجل! 🐾`;
+      let text = `مرحباً ${own.name}، إليك روشتة الكشف الطبي لـ (${pat.name}) من عيادة (${currentDoctor}):\n\n*التشخيص:* ${activeRx.diagnosis}\n\n*الأدوية المصروفة:*\n${activeRx.meds}\n\nتمنياتنا بالشفاء العاجل! 🐾`;
       window.open(`https://wa.me/${own.phone}?text=${encodeURIComponent(text)}`, '_blank');
     };
 
@@ -615,7 +487,7 @@
       document.getElementById('rxPatientSelect').value = pId;
     };
 
-    loadLocalFallback();
+    renderAll();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
