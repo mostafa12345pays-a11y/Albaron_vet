@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Albaron Vet - نظام إدارة العيادات البيطرية</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #005b66;
+      --primary-dark: #003d45;
+      --accent: #008b8b;
+      --bg: #f4f8f8;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); }
+    .navbar-custom { background-color: var(--primary); color: white; }
+    .card-kpi { border-radius: 12px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .btn-custom { background-color: var(--primary); color: white; }
+    .btn-custom:hover { background-color: var(--primary-dark); color: white; }
+    .nav-pills .nav-link.active { background-color: var(--primary); }
+    .nav-pills .nav-link { color: var(--primary); font-weight: bold; }
+    @media print {
+      body * { visibility: hidden; }
+      #printableArea, #printableArea * { visibility: visible; }
+      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-custom px-4 py-3 shadow-sm">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <span class="navbar-brand text-white fw-bold fs-4">
+        <i class="fa-solid fa-paw me-2"></i> Albaron Vet - نظام الأطباء والعيادات
+      </span>
+      <div id="userInfo" class="d-flex align-items-center gap-3">
+        <span class="badge bg-light text-dark p-2"><i class="fa-solid fa-user-md me-1"></i> د. أحمد (عيادة البارون)</span>
+        <button class="btn btn-outline-light btn-sm" onclick="demoLogin()"><i class="fa-solid fa-sign-in-alt me-1"></i> تسجيل دخول / تجربة</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid my-4">
+    <div class="row">
+      <!-- القائمة الجانبية -->
+      <div class="col-md-2 mb-3">
+        <div class="card card-kpi p-3">
+          <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist">
+            <button class="nav-link active text-start my-1" id="tab-dash" data-bs-toggle="pill" data-bs-target="#dash"><i class="fa-solid fa-chart-line me-2"></i>الرئيسية</button>
+            <button class="nav-link text-start my-1" id="tab-owners" data-bs-toggle="pill" data-bs-target="#owners"><i class="fa-solid fa-users me-2"></i>أصحاب الحالات</button>
+            <button class="nav-link text-start my-1" id="tab-patients" data-bs-toggle="pill" data-bs-target="#patients"><i class="fa-solid fa-dog me-2"></i>الحالات والحيوانات</button>
+            <button class="nav-link text-start my-1" id="tab-rx" data-bs-toggle="pill" data-bs-target="#rx"><i class="fa-solid fa-file-prescription me-2"></i>الروشتة والتشخيص</button>
+            <button class="nav-link text-start my-1" id="tab-pharmacy" data-bs-toggle="pill" data-bs-target="#pharmacy"><i class="fa-solid fa-pills me-2"></i>الصيدلية والمخزون</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- المحتوى الرئيسي -->
+      <div class="col-md-10">
+        <div class="tab-content" id="v-pills-tabContent">
+          
+          <!-- الرئيسية -->
+          <div class="tab-pane fade show active" id="dash">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-info">
+                  <h5>إجمالي الحالات</h5>
+                  <h2 id="kpiPatients">0</h2>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-success">
+                  <h5>أصحاب الحالات</h5>
+                  <h2 id="kpiOwners">0</h2>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-warning">
+                  <h5>الروشتات الصادرة</h5>
+                  <h2 id="kpiRx">0</h2>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-danger">
+                  <h5>أدوية منخفضة</h5>
+                  <h2 id="kpiLowStock">0</h2>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card card-kpi mt-4 p-4">
+              <h5><i class="fa-solid fa-clock-rotate-left me-2"></i>أحدث الحالات المسجلة</h5>
+              <table class="table table-hover mt-3">
+                <thead>
+                  <tr>
+                    <th>اسم الحيوان</th>
+                    <th>النوع</th>
+                    <th>اسم المالك</th>
+                    <th>الهاتف</th>
+                  </tr>
+                </thead>
+                <tbody id="recentPatientsTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- أصحاب الحالات -->
+          <div class="tab-pane fade" id="owners">
+            <div class="card card-kpi p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4><i class="fa-solid fa-user-gear me-2"></i>إدارة أصحاب الحالات</h4>
+                <button class="btn btn-custom" onclick="openOwnerModal()"><i class="fa-solid fa-plus me-1"></i> إضافة مالك جديد</button>
+              </div>
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>رقم الهاتف / الواتساب</th>
+                    <th>العنوان</th>
+                    <th>خيارات</th>
+                  </tr>
+                </thead>
+                <tbody id="ownersTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- الحالات والحيوانات -->
+          <div class="tab-pane fade" id="patients">
+            <div class="card card-kpi p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4><i class="fa-solid fa-paw me-2"></i>سجل الحالات البيطرية</h4>
+                <button class="btn btn-custom" onclick="openPatientModal()"><i class="fa-solid fa-plus me-1"></i> إضافة حالة جديدة</button>
+              </div>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>اسم الحيوان</th>
+                    <th>النوع / السلالة</th>
+                    <th>العمر</th>
+                    <th>الوزن</th>
+                    <th>المالك</th>
+                    <th>خيارات</th>
+                  </tr>
+                </thead>
+                <tbody id="patientsTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- الروشتة والتشخيص -->
+          <div class="tab-pane fade" id="rx">
+            <div class="card card-kpi p-4">
+              <h4><i class="fa-solid fa-notes-medical me-2"></i>إصدار روشتة وتصحيح تشخيص</h4>
+              <form id="rxForm" class="row g-3 mt-2">
+                <div class="col-md-4">
+                  <label class="form-label">اختر الحالة</label>
+                  <select class="form-select" id="rxPatientSelect" required></select>
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label">التشخيص الطبي</label>
+                  <input type="text" class="form-control" id="rxDiagnosis" placeholder="مثال: التهاب معوي حاد" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">الأدوية والجرعات المصروفة</label>
+                  <textarea class="form-control" id="rxMeds" rows="3" placeholder="مثال: 1. Amoxicillin - مرتين يومياً لمدة 5 أيام" required></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button type="submit" class="btn btn-custom"><i class="fa-solid fa-save me-1"></i> حفظ الروشتة</button>
+                </div>
+              </form>
+
+              <hr class="my-4">
+
+              <h5>الروشتات السابقة</h5>
+              <table class="table table-bordered mt-2">
+                <thead>
+                  <tr>
+                    <th>التاريخ</th>
+                    <th>الحالة</th>
+                    <th>المالك</th>
+                    <th>التشخيص</th>
+                    <th>طباعة / إرسال</th>
+                  </tr>
+                </thead>
+                <tbody id="rxTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- الصيدلية والمخزون -->
+          <div class="tab-pane fade" id="pharmacy">
+            <div class="card card-kpi p-4">
+              <h4><i class="fa-solid fa-capsules me-2"></i>الصيدلية البيطرية والمخزون</h4>
+              <table class="table table-hover mt-3">
+                <thead>
+                  <tr>
+                    <th>اسم الدواء</th>
+                    <th>السعر (ج.م)</th>
+                    <th>الكمية المتاحة</th>
+                    <th>الحالة</th>
+                  </tr>
+                </thead>
+                <tbody id="pharmacyTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- معاينة الروشتة للطباعة والواتساب -->
+  <div class="modal fade" id="printRxModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">الروشتة الطبية - Albaron Vet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="printableArea">
+          <div class="text-center border-bottom pb-3 mb-3">
+            <h2 style="color: var(--primary);">عيادة البارون البيطرية - Albaron Vet</h2>
+            <p class="mb-0">د. أحمد البيطري - أخصائي جراحة ورعاية الحيوانات الأليفة</p>
+            <small class="text-muted">هاتف: 01012345678 | العنوان: القاهرة</small>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6"><strong>اسم الحالة:</strong> <span id="pRxPatient"></span></div>
+            <div class="col-6"><strong>اسم المالك:</strong> <span id="pRxOwner"></span></div>
+            <div class="col-6"><strong>التاريخ:</strong> <span id="pRxDate"></span></div>
+            <div class="col-6"><strong>الهاتف:</strong> <span id="pRxPhone"></span></div>
+          </div>
+          <div class="mb-3">
+            <strong>التشخيص الطبي:</strong>
+            <p id="pRxDiagnosis" class="bg-light p-2 rounded"></p>
+          </div>
+          <div class="mb-3">
+            <strong>الأدوية والجرعات:</strong>
+            <pre id="pRxMeds" class="bg-light p-3 rounded" style="font-family: inherit; font-size: 1rem;"></pre>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" onclick="sendWhatsApp()"><i class="fa-brands fa-whatsapp me-1"></i> إرسال عبر الواتساب</button>
+          <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> طباعة (PDF)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // البيانات الابتدائية المخزنة
+    let owners = JSON.parse(localStorage.getItem('owners')) || [
+      { id: 1, name: "أحمد محمد", phone: "01012345678", address: "القاهرة" },
+      { id: 2, name: "سارة علي", phone: "01123456789", address: "الجيزة" }
+    ];
+
+    let patients = JSON.parse(localStorage.getItem('patients')) || [
+      { id: 1, name: "Bella", type: "كلب - Golden", age: "سنتين", weight: "25 كجم", ownerId: 1 },
+      { id: 2, name: "Milo", type: "قط - Shirazi", age: "سنة", weight: "4 كجم", ownerId: 2 }
+    ];
+
+    let rxs = JSON.parse(localStorage.getItem('rxs')) || [
+      { id: 1, patientId: 1, diagnosis: "فحص دوري وتطعيم", meds: "1. Rabies Vaccine\n2. Vitamin B Complex", date: "2026-10-31" }
+    ];
+
+    let meds = [
+      { name: "Amoxicillin 250mg", price: 150, qty: 18 },
+      { name: "Heartgard Plus", price: 320, qty: 3 },
+      { name: "Frontline Spot-On", price: 210, qty: 12 }
+    ];
+
+    let activeRx = null;
+
+    function renderAll() {
+      // KPIs
+      document.getElementById('kpiPatients').innerText = patients.length;
+      document.getElementById('kpiOwners').innerText = owners.length;
+      document.getElementById('kpiRx').innerText = rxs.length;
+      document.getElementById('kpiLowStock').innerText = meds.filter(m => m.qty <= 5).length;
+
+      // Tables
+      let recentHtml = '';
+      patients.slice(-5).forEach(p => {
+        let owner = owners.find(o => o.id == p.ownerId) || {};
+        recentHtml += `<tr><td>${p.name}</td><td>${p.type}</td><td>${owner.name || '-'}</td><td>${owner.phone || '-'}</td></tr>`;
+      });
+      document.getElementById('recentPatientsTable').innerHTML = recentHtml;
+
+      // Owners
+      let ownerHtml = '';
+      owners.forEach(o => {
+        ownerHtml += `<tr><td>${o.name}</td><td>${o.phone}</td><td>${o.address}</td><td><button class="btn btn-sm btn-outline-success" onclick="sendDirectWA('${o.phone}')"><i class="fa-brands fa-whatsapp"></i></button></td></tr>`;
+      });
+      document.getElementById('ownersTable').innerHTML = ownerHtml;
+
+      // Patients
+      let patientHtml = '';
+      patients.forEach(p => {
+        let owner = owners.find(o => o.id == p.ownerId) || {};
+        patientHtml += `<tr><td>${p.name}</td><td>${p.type}</td><td>${p.age}</td><td>${p.weight}</td><td>${owner.name || '-'}</td><td><button class="btn btn-sm btn-custom" onclick="selectRxPatient(${p.id})">روشتة جديدة</button></td></tr>`;
+      });
+      document.getElementById('patientsTable').innerHTML = patientHtml;
+
+      // Rx Patient Select
+      let selectHtml = '<option value="">اختر الحالة...</option>';
+      patients.forEach(p => {
+        selectHtml += `<option value="${p.id}">${p.name} (مالك: ${owners.find(o => o.id == p.ownerId)?.name || ''})</option>`;
+      });
+      document.getElementById('rxPatientSelect').innerHTML = selectHtml;
+
+      // Rx Table
+      let rxHtml = '';
+      rxs.forEach(r => {
+        let pat = patients.find(p => p.id == r.patientId) || {};
+        let own = owners.find(o => o.id == pat.ownerId) || {};
+        rxHtml += `<tr>
+          <td>${r.date}</td>
+          <td>${pat.name || '-'}</td>
+          <td>${own.name || '-'}</td>
+          <td>${r.diagnosis}</td>
+          <td><button class="btn btn-sm btn-primary" onclick="openPrintModal(${r.id})"><i class="fa-solid fa-print"></i> معاينة / إرسال</button></td>
+        </tr>`;
+      });
+      document.getElementById('rxTable').innerHTML = rxHtml;
+
+      // Pharmacy
+      let medHtml = '';
+      meds.forEach(m => {
+        let status = m.qty <= 5 ? '<span class="badge bg-danger">⚠️ نقص مخزون</span>' : '<span class="badge bg-success">متوفر</span>';
+        medHtml += `<tr><td>${m.name}</td><td>${m.price} ج.م</td><td>${m.qty}</td><td>${status}</td></tr>`;
+      });
+      document.getElementById('pharmacyTable').innerHTML = medHtml;
+    }
+
+    // Rx Form
+    document.getElementById('rxForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let pId = document.getElementById('rxPatientSelect').value;
+      let diag = document.getElementById('rxDiagnosis').value;
+      let medsText = document.getElementById('rxMeds').value;
+
+      let newRx = {
+        id: Date.now(),
+        patientId: parseInt(pId),
+        diagnosis: diag,
+        meds: medsText,
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      rxs.push(newRx);
+      localStorage.setItem('rxs', JSON.stringify(rxs));
+      document.getElementById('rxForm').reset();
+      renderAll();
+      openPrintModal(newRx.id);
+    });
+
+    function openPrintModal(rxId) {
+      activeRx = rxs.find(r => r.id == rxId);
+      if(!activeRx) return;
+      let pat = patients.find(p => p.id == activeRx.patientId) || {};
+      let own = owners.find(o => o.id == pat.ownerId) || {};
+
+      document.getElementById('pRxPatient').innerText = pat.name || '';
+      document.getElementById('pRxOwner').innerText = own.name || '';
+      document.getElementById('pRxDate').innerText = activeRx.date;
+      document.getElementById('pRxPhone').innerText = own.phone || '';
+      document.getElementById('pRxDiagnosis').innerText = activeRx.diagnosis;
+      document.getElementById('pRxMeds').innerText = activeRx.meds;
+
+      let modal = new bootstrap.Modal(document.getElementById('printRxModal'));
+      modal.show();
+    }
+
+    function sendWhatsApp() {
+      if(!activeRx) return;
+      let pat = patients.find(p => p.id == activeRx.patientId) || {};
+      let own = owners.find(o => o.id == pat.ownerId) || {};
+      let text = `مرحباً ${own.name}، إليك روشتة الكشف الطبي لـ (${pat.name}) من عيادة Albaron Vet:\n\n*التشخيص:* ${activeRx.diagnosis}\n\n*الأدوية المصروفة:*\n${activeRx.meds}\n\nتمنياتنا بالشفاء العاجل! 🐾`;
+      window.open(`https://wa.me/${own.phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function sendDirectWA(phone) {
+      window.open(`https://wa.me/${phone}`, '_blank');
+    }
+
+    function selectRxPatient(pId) {
+      document.getElementById('tab-rx').click();
+      document.getElementById('rxPatientSelect').value = pId;
+    }
+
+    function demoLogin() {
+      alert("تم تسجيل الدخول بحساب العيادة التجريبي (د. أحمد)");
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
