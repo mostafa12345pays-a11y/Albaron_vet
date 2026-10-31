@@ -346,7 +346,6 @@
     let currentDoctor = localStorage.getItem('albaron_doc') || "";
     if (currentDoctor) startApp(currentDoctor);
 
-    // تسجيل الدخول بالبريد الإلكتروني
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let email = document.getElementById('loginEmail').value.trim();
@@ -359,11 +358,10 @@
         localStorage.setItem('albaron_doc', currentDoctor);
         startApp(currentDoctor);
       } else {
-        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة! تأكد من إنشاء الحساب أولاً إن لم تقم بذلك.");
+        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة!");
       }
     });
 
-    // إنشاء حساب جديد بالبريد الإلكتروني
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let name = document.getElementById('regName').value.trim();
@@ -588,7 +586,7 @@
       if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
     }
 
-    // حفظ المالك المباشر وتحديث الجدول وإغلاق النافذة بدون إعادة تحميل الصفحة
+    // حفظ المالك وتحديث الجدول فوراً دون إعادة تحميل الصفحة
     function saveOwnerDirect() {
       let name = document.getElementById('ownerName').value.trim();
       let phone = document.getElementById('ownerPhone').value.trim();
@@ -608,7 +606,6 @@
       if(modalObj) modalObj.hide();
     }
 
-    // حفظ الحالة المباشر
     function savePatientDirect() {
       let name = document.getElementById('patName').value.trim();
       let type = document.getElementById('patType').value.trim();
@@ -630,7 +627,6 @@
       if(modalObj) modalObj.hide();
     }
 
-    // حفظ الدواء المباشر
     function saveMedDirect() {
       let name = document.getElementById('medNameInput').value.trim();
       let price = Number(document.getElementById('medPriceInput').value);
