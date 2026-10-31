@@ -450,7 +450,7 @@
 
     function openModal(modalId) {
       let modalElement = document.getElementById(modalId);
-      let modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+      let modalInstance = new bootstrap.Modal(modalElement);
       modalInstance.show();
       if(modalId === 'ownerModal') {
         document.getElementById('ownerAlertMsg').style.display = 'none';
@@ -468,6 +468,12 @@
         document.getElementById('medPriceInput').value = '';
         document.getElementById('medQtyInput').value = '';
       }
+    }
+
+    function closeModal(modalId) {
+      let modalElement = document.getElementById(modalId);
+      let modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if(modalInstance) modalInstance.hide();
     }
 
     // فحص رقم الهاتف أثناء الكتابة لعرض تنبيه بأن العميل زار العيادة من قبل
@@ -586,7 +592,7 @@
       if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
     }
 
-    // حفظ المالك وتحديث الجدول فوراً دون إعادة تحميل الصفحة
+    // حفظ المالك وتحديث الجدول فوراً وإغلاق النافذة بنجاح
     function saveOwnerDirect() {
       let name = document.getElementById('ownerName').value.trim();
       let phone = document.getElementById('ownerPhone').value.trim();
@@ -600,10 +606,7 @@
       owners.push({ id: Date.now().toString(), name, phone, address });
       saveData(); 
       renderAll();
-      
-      let modalEl = document.getElementById('ownerModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
+      closeModal('ownerModal');
     }
 
     function savePatientDirect() {
@@ -621,10 +624,7 @@
       patients.push({ id: Date.now().toString(), name, type, age, weight, ownerName });
       saveData(); 
       renderAll();
-      
-      let modalEl = document.getElementById('patientModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
+      closeModal('patientModal');
     }
 
     function saveMedDirect() {
@@ -640,10 +640,7 @@
       meds.push({ id: Date.now().toString(), name, price, qty });
       saveData(); 
       renderAll();
-      
-      let modalEl = document.getElementById('medModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
+      closeModal('medModal');
     }
 
     function saveRxDataDirect() {
