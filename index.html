@@ -27,23 +27,23 @@
       justify-content: center;
       background: linear-gradient(135deg, #005b66 0%, #003d45 100%);
     }
-    .app-logo { max-height: 110px; object-fit: contain; }
+    .app-logo { max-height: 90px; object-fit: contain; }
     .navbar-logo { max-height: 40px; object-fit: contain; }
   </style>
 </head>
 <body>
 
-  <!-- شاشة تسجيل الدخول والتوثيق المتقدمة مع اللوجو المدمج -->
+  <!-- شاشة تسجيل الدخول والتوثيق -->
   <div id="authScreen">
     <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 480px;">
       <div class="mb-3">
-        <!-- اللوجو مدمج مباشرة لضمان ظهوره الفوري دون أخطاء مسار -->
-        <img src="https://i.ibb.co/3yk5Q6y/logo.png" alt="Albaron Vet Logo" class="app-logo mb-2 rounded shadow-sm" onerror="this.src='98723.jpg'">
+        <!-- استخدام اللوجو المباشر المدمج لضمان ظهوره 100% -->
+        <img src="https://i.ibb.co/3yk5Q6y/logo.png" alt="Albaron Vet Logo" class="app-logo mb-2 rounded shadow-sm" onerror="this.src='https://via.placeholder.com/150/005b66/FFFFFF?text=Albaron+Vet'">
         <h3 style="color: var(--primary);" class="fw-bold mt-2"><i class="fa-solid fa-paw me-2"></i>Albaron Vet</h3>
         <p class="text-muted small">نظام إدارة العيادات البيطرية المخصص</p>
       </div>
 
-      <!-- أزرار التبديل الواضحة -->
+      <!-- أزرار التبديل -->
       <div class="d-flex gap-2 w-100 mb-3">
         <button type="button" class="btn btn-dark flex-fill fw-bold" id="tabBtnLogin" onclick="switchTab('login')">تسجيل الدخول</button>
         <button type="button" class="btn btn-outline-dark flex-fill fw-bold" id="tabBtnRegister" onclick="switchTab('register')">إنشاء حساب جديد</button>
@@ -53,8 +53,8 @@
       <div id="loginSection">
         <form id="loginForm">
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">اسم المستخدم أو رقم الهاتف</label>
-            <input type="text" class="form-control" id="loginIdentifier" placeholder="ادخل الاسم أو رقم الهاتف" required>
+            <label class="form-label fw-bold">اسم المستخدم أو رقم الهاتف أو البريد</label>
+            <input type="text" class="form-control" id="loginIdentifier" placeholder="ادخل الاسم أو الهاتف أو البريد" required>
           </div>
           <div class="mb-2 text-start">
             <label class="form-label fw-bold">كلمة المرور</label>
@@ -75,8 +75,8 @@
             <input type="text" class="form-control" id="regName" placeholder="مثال: د. أحمد" required>
           </div>
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">رقم الهاتف أو البريد</label>
-            <input type="text" class="form-control" id="regContact" placeholder="مثال: 01012345678" required>
+            <label class="form-label fw-bold">رقم الهاتف أو البريد الإلكتروني</label>
+            <input type="text" class="form-control" id="regContact" placeholder="مثال: 01012345678 أو email@vet.com" required>
           </div>
           <div class="mb-3 text-start">
             <label class="form-label fw-bold">كلمة المرور الجديدة</label>
@@ -86,13 +86,13 @@
         </form>
       </div>
 
-      <!-- استعادة كلمة المرور -->
+      <!-- استعادة كلمة المرور عبر الهاتف أو البريد -->
       <div id="forgotSection" style="display: none;">
         <div id="forgotStep1">
-          <p class="text-muted small text-start">أدخل رقم الهاتف المسجل وسنرسل لك كود التحقق لاستعادة الحساب.</p>
+          <p class="text-muted small text-start">أدخل رقم الهاتف أو البريد الإلكتروني المسجل وسنرسل لك كود التحقق لاستعادة الحساب.</p>
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">رقم الهاتف المسجل</label>
-            <input type="text" class="form-control" id="forgotPhone" placeholder="مثال: 01012345678" required>
+            <label class="form-label fw-bold">الهاتف أو البريد المسجل</label>
+            <input type="text" class="form-control" id="forgotContact" placeholder="مثال: 01012345678 أو البريد" required>
           </div>
           <button type="button" class="btn btn-custom w-100 py-2 fw-bold mb-2" onclick="sendResetCode()">إرسال كود التحقق</button>
           <button type="button" class="btn btn-outline-secondary w-100 btn-sm" onclick="switchTab('login')">العودة لتسجيل الدخول</button>
@@ -120,7 +120,7 @@
     <nav class="navbar navbar-custom px-4 py-3 shadow-sm">
       <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
-          <img src="https://i.ibb.co/3yk5Q6y/logo.png" alt="Logo" class="navbar-logo bg-white rounded p-1" onerror="this.src='98723.jpg'">
+          <img src="https://i.ibb.co/3yk5Q6y/logo.png" alt="Logo" class="navbar-logo bg-white rounded p-1" onerror="this.src='https://via.placeholder.com/150/005b66/FFFFFF?text=Logo'">
           <span class="navbar-brand text-white fw-bold fs-4">Albaron Vet</span>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -210,7 +210,7 @@
                 <hr class="my-4">
                 <h5>الروشتات السابقة</h5>
                 <table class="table table-bordered mt-2">
-                  <thead><tr><th>التاريخ</th><th>الحالة</th><th>التشخيص</th><th>خيارات</th></tr></thead>
+                  <thead><tr><th>التاريخ</th><th>الحالة</th><th>التشخيص</th><th>خيارات والحذف</th></tr></thead>
                   <tbody id="rxTable"></tbody>
                 </table>
               </div>
@@ -224,7 +224,7 @@
                   <button class="btn btn-custom" onclick="openModal('medModal')"><i class="fa-solid fa-plus me-1"></i> إضافة دواء</button>
                 </div>
                 <table class="table table-hover mt-3">
-                  <thead><tr><th>الدواء</th><th>السعر</th><th>الكمية</th><th>الحالة</th><th>التحكم بالمخزون</th></tr></thead>
+                  <thead><tr><th>الدواء</th><th>السعر</th><th>الكمية</th><th>الحالة</th><th>التحكم بالمخزون والحذف</th></tr></thead>
                   <tbody id="pharmacyTable"></tbody>
                 </table>
               </div>
@@ -292,7 +292,7 @@
         localStorage.setItem('albaron_doc', currentDoctor);
         startApp(currentDoctor);
       } else {
-        alert("خطأ: اسم المستخدم أو رقم الهاتف أو كلمة المرور غير صحيحة!");
+        alert("خطأ: اسم المستخدم أو الهاتف أو البريد أو كلمة المرور غير صحيحة!");
       }
     });
 
@@ -320,17 +320,17 @@
     let resetTargetDoc = null;
 
     function sendResetCode() {
-      let phone = document.getElementById('forgotPhone').value.trim();
-      let doc = allDoctors.find(d => d.contact === phone);
+      let contactInput = document.getElementById('forgotContact').value.trim();
+      let doc = allDoctors.find(d => d.contact === contactInput);
 
       if(!doc) {
-        alert("رقم الهاتف غير مسجل لدينا!");
+        alert("رقم الهاتف أو البريد الإلكتروني غير مسجل لدينا!");
         return;
       }
 
       resetTargetDoc = doc;
       generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      alert("رمز التحقق (OTP) الخاص بك هو: " + generatedOtp);
+      alert("رمز التحقق (OTP) المرسل إلى هاتفك/بريدك هو: " + generatedOtp);
 
       document.getElementById('forgotStep1').style.display = 'none';
       document.getElementById('forgotStep2').style.display = 'block';
@@ -425,14 +425,19 @@
           <td>-</td>
         </tr>`).join('');
 
+      // جدول الروشتات مع زر الحذف
       document.getElementById('rxTable').innerHTML = rxs.map(r => `
         <tr>
           <td>${r.date}</td>
           <td>${r.patientName || '-'}</td>
           <td>${r.diagnosis}</td>
-          <td><button class="btn btn-sm btn-primary" onclick="alert('الأدوية والجرعات:\\n${r.meds}')">عرض</button></td>
+          <td>
+            <button class="btn btn-sm btn-primary me-1" onclick="alert('الأدوية والجرعات:\\n${r.meds}')"><i class="fa-solid fa-eye"></i> عرض</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteRx('${r.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
+          </td>
         </tr>`).join('');
 
+      // جدول الصيدلية والمخزون مع زر الحذف
       document.getElementById('pharmacyTable').innerHTML = meds.map(m => `
         <tr>
           <td>${m.name}</td>
@@ -440,8 +445,9 @@
           <td>${m.qty}</td>
           <td>${m.qty <= 5 ? '<span class="badge bg-danger">منخفض</span>' : '<span class="badge bg-success">متوفر</span>'}</td>
           <td>
-            <button class="btn btn-sm btn-outline-danger" onclick="updateQty('${m.id}', -1)">-</button> 
-            <button class="btn btn-sm btn-outline-success" onclick="updateQty('${m.id}', 1)">+</button>
+            <button class="btn btn-sm btn-outline-danger me-1" onclick="updateQty('${m.id}', -1)">-</button> 
+            <button class="btn btn-sm btn-outline-success me-2" onclick="updateQty('${m.id}', 1)">+</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteMed('${m.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
           </td>
         </tr>`).join('');
     }
@@ -456,6 +462,20 @@
     function deletePatient(id) {
       if(confirm('هل أنت متأكد من حذف هذه الحالة؟')) {
         patients = patients.filter(p => p.id !== id);
+        saveData(); renderAll();
+      }
+    }
+
+    function deleteRx(id) {
+      if(confirm('هل أنت متأكد من حذف هذه الروشتة؟')) {
+        rxs = rxs.filter(r => r.id !== id);
+        saveData(); renderAll();
+      }
+    }
+
+    function deleteMed(id) {
+      if(confirm('هل أنت متأكد من حذف هذا الدواء من المخزون؟')) {
+        meds = meds.filter(m => m.id !== id);
         saveData(); renderAll();
       }
     }
