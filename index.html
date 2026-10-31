@@ -44,7 +44,6 @@
   <div id="authScreen">
     <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 480px;">
       <div class="mb-3">
-        <!-- أيقونة احترافية بديلة للوجو لضمان عدم تعطل الصفحة أبداً -->
         <div class="d-inline-block">
           <i class="fa-solid fa-paw logo-icon shadow-sm"></i>
         </div>
@@ -209,15 +208,15 @@
             <div class="tab-pane fade" id="rx">
               <div class="card card-kpi p-4">
                 <h4>إصدار روشتة وتصحيح تشخيص</h4>
-                <form id="rxForm" class="row g-3 mt-2">
+                <div class="row g-3 mt-2">
                   <div class="col-md-4">
                     <label class="form-label">اسم الحالة (اكتبها يدوياً)</label>
-                    <input type="text" class="form-control" id="rxPatientName" placeholder="مثال: Bella" required>
+                    <input type="text" class="form-control" id="rxPatientName" placeholder="مثال: Bella">
                   </div>
-                  <div class="col-md-8"><label class="form-label">التشخيص</label><input type="text" class="form-control" id="rxDiagnosis" required></div>
-                  <div class="col-12"><label class="form-label">الأدوية والجرعات</label><textarea class="form-control" id="rxMeds" rows="3" required></textarea></div>
-                  <div class="col-12"><button type="submit" class="btn btn-custom">حفظ الروشتة</button></div>
-                </form>
+                  <div class="col-md-8"><label class="form-label">التشخيص</label><input type="text" class="form-control" id="rxDiagnosis"></div>
+                  <div class="col-12"><label class="form-label">الأدوية والجرعات</label><textarea class="form-control" id="rxMeds" rows="3"></textarea></div>
+                  <div class="col-12"><button type="button" class="btn btn-custom" onclick="saveRxDataDirect()">حفظ الروشتة</button></div>
+                </div>
                 <hr class="my-4">
                 <h5>الروشتات السابقة</h5>
                 <table class="table table-bordered mt-2">
@@ -247,7 +246,7 @@
     </div>
   </div>
 
-  <!-- Modal المالك (تمت إضافة خاصية oninput والتنبيه هنا) -->
+  <!-- Modal المالك -->
   <div class="modal fade" id="ownerModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -256,33 +255,62 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <form id="ownerForm">
-            <div class="mb-3">
-              <label>الاسم</label>
-              <input type="text" class="form-control" id="ownerName" required>
-            </div>
-            <div class="mb-3">
-              <label>الهاتف</label>
-              <!-- تم إضافة oninput لفحص رقم الهاتف أثناء الكتابة -->
-              <input type="text" class="form-control" id="ownerPhone" oninput="checkExistingOwner(this.value)" required>
-              <div id="ownerAlertMsg" class="form-text text-danger fw-bold mt-1" style="display: none;"></div>
-            </div>
-            <div class="mb-3">
-              <label>العنوان</label>
-              <input type="text" class="form-control" id="ownerAddress" required>
-            </div>
-            <button type="submit" class="btn btn-custom w-100">حفظ</button>
-          </form>
+          <div class="mb-3">
+            <label class="form-label">الاسم</label>
+            <input type="text" class="form-control" id="ownerName">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الهاتف</label>
+            <input type="text" class="form-control" id="ownerPhone" oninput="checkExistingOwner(this.value)">
+            <div id="ownerAlertMsg" class="form-text text-danger fw-bold mt-1" style="display: none;"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">العنوان</label>
+            <input type="text" class="form-control" id="ownerAddress">
+          </div>
+          <button type="button" class="btn btn-custom w-100" onclick="saveOwnerDirect()">حفظ البيانات</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Modal الحيوان -->
-  <div class="modal fade" id="patientModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة حالة</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="patientForm"><div class="mb-3"><label>اسم الحيوان</label><input type="text" class="form-control" id="patName" required></div><div class="mb-3"><label>النوع</label><input type="text" class="form-control" id="patType" required></div><div class="mb-3"><label>العمر</label><input type="text" class="form-control" id="patAge" required></div><div class="mb-3"><label>الوزن</label><input type="text" class="form-control" id="patWeight" required></div><div class="mb-3"><label>اسم المالك (اكتبه يدوياً)</label><input type="text" class="form-control" id="patOwnerInput" placeholder="مثال: أحمد محمد" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
+  <div class="modal fade" id="patientModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة حالة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">اسم الحيوان</label><input type="text" class="form-control" id="patName"></div>
+          <div class="mb-3"><label class="form-label">النوع</label><input type="text" class="form-control" id="patType"></div>
+          <div class="mb-3"><label class="form-label">العمر</label><input type="text" class="form-control" id="patAge"></div>
+          <div class="mb-3"><label class="form-label">الوزن</label><input type="text" class="form-control" id="patWeight"></div>
+          <div class="mb-3"><label class="form-label">اسم المالك (اكتبه يدوياً)</label><input type="text" class="form-control" id="patOwnerInput" placeholder="مثال: أحمد محمد"></div>
+          <button type="button" class="btn btn-custom w-100" onclick="savePatientDirect()">حفظ البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal الدواء -->
-  <div class="modal fade" id="medModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة دواء</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="medForm"><div class="mb-3"><label>اسم الدواء</label><input type="text" class="form-control" id="medNameInput" required></div><div class="mb-3"><label>السعر</label><input type="number" class="form-control" id="medPriceInput" required></div><div class="mb-3"><label>الكمية</label><input type="number" class="form-control" id="medQtyInput" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
+  <div class="modal fade" id="medModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة دواء</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">اسم الدواء</label><input type="text" class="form-control" id="medNameInput"></div>
+          <div class="mb-3"><label class="form-label">السعر</label><input type="number" class="form-control" id="medPriceInput"></div>
+          <div class="mb-3"><label class="form-label">الكمية</label><input type="number" class="form-control" id="medQtyInput"></div>
+          <button type="button" class="btn btn-custom w-100" onclick="saveMedDirect()">حفظ البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -424,15 +452,27 @@
 
     function openModal(modalId) {
       let modalElement = document.getElementById(modalId);
-      let modalInstance = new bootstrap.Modal(modalElement);
+      let modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
       modalInstance.show();
       if(modalId === 'ownerModal') {
         document.getElementById('ownerAlertMsg').style.display = 'none';
-        document.getElementById('ownerForm').reset();
+        document.getElementById('ownerName').value = '';
+        document.getElementById('ownerPhone').value = '';
+        document.getElementById('ownerAddress').value = '';
+      } else if(modalId === 'patientModal') {
+        document.getElementById('patName').value = '';
+        document.getElementById('patType').value = '';
+        document.getElementById('patAge').value = '';
+        document.getElementById('patWeight').value = '';
+        document.getElementById('patOwnerInput').value = '';
+      } else if(modalId === 'medModal') {
+        document.getElementById('medNameInput').value = '';
+        document.getElementById('medPriceInput').value = '';
+        document.getElementById('medQtyInput').value = '';
       }
     }
 
-    // [دالة جديدة] فحص رقم هاتف المالك أثناء الكتابة لإظهار تنبيه زيارته السابقة
+    // فحص رقم الهاتف أثناء الكتابة لعرض تنبيه بأن العميل زار العيادة من قبل
     function checkExistingOwner(phoneVal) {
       let alertBox = document.getElementById('ownerAlertMsg');
       let trimmedPhone = phoneVal.trim();
@@ -548,70 +588,93 @@
       if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
     }
 
-    document.getElementById('ownerForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      owners.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('ownerName').value, 
-        phone: document.getElementById('ownerPhone').value, 
-        address: document.getElementById('ownerAddress').value
-      });
+    // حفظ المالك المباشر بدون إعادة تحميل الصفحة
+    function saveOwnerDirect() {
+      let name = document.getElementById('ownerName').value.trim();
+      let phone = document.getElementById('ownerPhone').value.trim();
+      let address = document.getElementById('ownerAddress').value.trim();
+
+      if(!name || !phone || !address) {
+        alert("يرجى تعبئة كافة حقول المالك!");
+        return;
+      }
+
+      owners.push({ id: Date.now().toString(), name, phone, address });
       saveData(); 
       renderAll();
+      
       let modalEl = document.getElementById('ownerModal');
       let modalObj = bootstrap.Modal.getInstance(modalEl);
       if(modalObj) modalObj.hide();
-      e.target.reset();
-      document.getElementById('ownerAlertMsg').style.display = 'none';
-    });
+    }
 
-    document.getElementById('patientForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      patients.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('patName').value, 
-        type: document.getElementById('patType').value, 
-        age: document.getElementById('patAge').value, 
-        weight: document.getElementById('patWeight').value, 
-        ownerName: document.getElementById('patOwnerInput').value
-      });
+    // حفظ الحالة المباشر بدون إعادة تحميل الصفحة
+    function savePatientDirect() {
+      let name = document.getElementById('patName').value.trim();
+      let type = document.getElementById('patType').value.trim();
+      let age = document.getElementById('patAge').value.trim();
+      let weight = document.getElementById('patWeight').value.trim();
+      let ownerName = document.getElementById('patOwnerInput').value.trim();
+
+      if(!name || !type || !ownerName) {
+        alert("يرجى تعبئة الحقول الأساسية للحالة!");
+        return;
+      }
+
+      patients.push({ id: Date.now().toString(), name, type, age, weight, ownerName });
       saveData(); 
       renderAll();
+      
       let modalEl = document.getElementById('patientModal');
       let modalObj = bootstrap.Modal.getInstance(modalEl);
       if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
+    }
 
-    document.getElementById('medForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      meds.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('medNameInput').value, 
-        price: Number(document.getElementById('medPriceInput').value), 
-        qty: Number(document.getElementById('medQtyInput').value)
-      });
+    // حفظ الدواء المباشر بدون إعادة تحميل الصفحة
+    function saveMedDirect() {
+      let name = document.getElementById('medNameInput').value.trim();
+      let price = Number(document.getElementById('medPriceInput').value);
+      let qty = Number(document.getElementById('medQtyInput').value);
+
+      if(!name) {
+        alert("يرجى إدخال اسم الدواء!");
+        return;
+      }
+
+      meds.push({ id: Date.now().toString(), name, price, qty });
       saveData(); 
       renderAll();
+      
       let modalEl = document.getElementById('medModal');
       let modalObj = bootstrap.Modal.getInstance(modalEl);
       if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
+    }
 
-    document.getElementById('rxForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    function saveRxDataDirect() {
+      let patientName = document.getElementById('rxPatientName').value.trim();
+      let diagnosis = document.getElementById('rxDiagnosis').value.trim();
+      let medsVal = document.getElementById('rxMeds').value.trim();
+
+      if(!patientName || !diagnosis) {
+        alert("يرجى إدخال اسم الحالة والتشخيص!");
+        return;
+      }
+
       rxs.push({
         id: Date.now().toString(), 
-        patientName: document.getElementById('rxPatientName').value, 
-        diagnosis: document.getElementById('rxDiagnosis').value, 
-        meds: document.getElementById('rxMeds').value, 
+        patientName, 
+        diagnosis, 
+        meds: medsVal, 
         date: new Date().toLocaleDateString()
       });
-      saveData(); renderAll();
-      e.target.reset();
+      saveData(); 
+      renderAll();
+      
+      document.getElementById('rxPatientName').value = '';
+      document.getElementById('rxDiagnosis').value = '';
+      document.getElementById('rxMeds').value = '';
       alert("تم حفظ الروشتة بنجاح!");
-    });
+    }
 
     function selectRx(name) {
       document.getElementById('link-rx').click();
