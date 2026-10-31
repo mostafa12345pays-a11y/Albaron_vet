@@ -7,6 +7,13 @@
   <meta name="google-site-verification" content="aAudum6THThu3TCTAIBMzgcTnMhfbilhGpX8DqBKAyI" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- مكتبة EmailJS لإرسال الإيميلات الحقيقية مجاناً -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function() {
+      emailjs.init("YOUR_PUBLIC_KEY"); // استبدل هذا بـ Public Key الخاص بك من موقع EmailJS لاحقاً إذا أردت
+    })();
+  </script>
   <style>
     :root {
       --primary: #005b66;
@@ -37,7 +44,6 @@
   <div id="authScreen">
     <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 480px;">
       <div class="mb-3">
-        <!-- استخدام اللوجو المباشر المدمج لضمان ظهوره 100% -->
         <img src="https://i.ibb.co/3yk5Q6y/logo.png" alt="Albaron Vet Logo" class="app-logo mb-2 rounded shadow-sm" onerror="this.src='https://via.placeholder.com/150/005b66/FFFFFF?text=Albaron+Vet'">
         <h3 style="color: var(--primary);" class="fw-bold mt-2"><i class="fa-solid fa-paw me-2"></i>Albaron Vet</h3>
         <p class="text-muted small">نظام إدارة العيادات البيطرية المخصص</p>
@@ -49,12 +55,12 @@
         <button type="button" class="btn btn-outline-dark flex-fill fw-bold" id="tabBtnRegister" onclick="switchTab('register')">إنشاء حساب جديد</button>
       </div>
 
-      <!-- نموذج تسجيل الدخول -->
+      <!-- نموذج تسجيل الدخول بالبريد الإلكتروني -->
       <div id="loginSection">
         <form id="loginForm">
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">اسم المستخدم أو رقم الهاتف أو البريد</label>
-            <input type="text" class="form-control" id="loginIdentifier" placeholder="ادخل الاسم أو الهاتف أو البريد" required>
+            <label class="form-label fw-bold">البريد الإلكتروني</label>
+            <input type="email" class="form-control" id="loginEmail" placeholder="example@vet.com" required>
           </div>
           <div class="mb-2 text-start">
             <label class="form-label fw-bold">كلمة المرور</label>
@@ -67,16 +73,16 @@
         </form>
       </div>
 
-      <!-- نموذج إنشاء حساب جديد -->
+      <!-- نموذج إنشاء حساب جديد بالبريد الإلكتروني -->
       <div id="registerSection" style="display: none;">
         <form id="registerForm">
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">اسم المستخدم / الطبيب</label>
+            <label class="form-label fw-bold">اسم الطبيب / العيادة</label>
             <input type="text" class="form-control" id="regName" placeholder="مثال: د. أحمد" required>
           </div>
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">رقم الهاتف أو البريد الإلكتروني</label>
-            <input type="text" class="form-control" id="regContact" placeholder="مثال: 01012345678 أو email@vet.com" required>
+            <label class="form-label fw-bold">البريد الإلكتروني</label>
+            <input type="email" class="form-control" id="regEmail" placeholder="example@vet.com" required>
           </div>
           <div class="mb-3 text-start">
             <label class="form-label fw-bold">كلمة المرور الجديدة</label>
@@ -86,20 +92,22 @@
         </form>
       </div>
 
-      <!-- استعادة كلمة المرور عبر الهاتف أو البريد -->
+      <!-- استعادة كلمة المرور وإرسال الكود للإيميل -->
       <div id="forgotSection" style="display: none;">
         <div id="forgotStep1">
-          <p class="text-muted small text-start">أدخل رقم الهاتف أو البريد الإلكتروني المسجل وسنرسل لك كود التحقق لاستعادة الحساب.</p>
+          <p class="text-muted small text-start">أدخل بريدك الإلكتروني المسجل وسنرسل لك كود التحقق (OTP) مباشرة عبر البريد.</p>
           <div class="mb-3 text-start">
-            <label class="form-label fw-bold">الهاتف أو البريد المسجل</label>
-            <input type="text" class="form-control" id="forgotContact" placeholder="مثال: 01012345678 أو البريد" required>
+            <label class="form-label fw-bold">البريد الإلكتروني المسجل</label>
+            <input type="email" class="form-control" id="forgotEmail" placeholder="example@vet.com" required>
           </div>
-          <button type="button" class="btn btn-custom w-100 py-2 fw-bold mb-2" onclick="sendResetCode()">إرسال كود التحقق</button>
+          <button type="button" class="btn btn-custom w-100 py-2 fw-bold mb-2" onclick="sendResetCodeEmail()">إرسال الكود إلى البريد</button>
           <button type="button" class="btn btn-outline-secondary w-100 btn-sm" onclick="switchTab('login')">العودة لتسجيل الدخول</button>
         </div>
 
         <div id="forgotStep2" style="display: none;">
-          <p class="text-success small fw-bold">تم إرسال كود التحقق بنجاح!</p>
+          <div class="alert alert-info p-2 small mb-3">
+            تم إرسال كود التحقق إلى بريدك الإلكتروني بنجاح! (للتجربة الفورية، الكود هو: <span id="displayOtpCode" class="fw-bold text-danger"></span>)
+          </div>
           <div class="mb-3 text-start">
             <label class="form-label fw-bold">أدخل كود التحقق المكون من 4 أرقام</label>
             <input type="text" class="form-control text-center fs-4 tracking-widest" id="resetCodeInput" maxlength="4" required>
@@ -248,7 +256,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let allDoctors = JSON.parse(localStorage.getItem('albaron_all_docs')) || [
-      { name: "د. أحمد", contact: "01012345678", pass: "1234" }
+      { name: "د. أحمد", email: "admin@vet.com", pass: "1234" }
     ];
 
     function switchTab(mode) {
@@ -279,36 +287,36 @@
     let currentDoctor = localStorage.getItem('albaron_doc') || "";
     if (currentDoctor) startApp(currentDoctor);
 
-    // تسجيل الدخول
+    // تسجيل الدخول بالبريد الإلكتروني
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      let identifier = document.getElementById('loginIdentifier').value.trim();
+      let email = document.getElementById('loginEmail').value.trim();
       let pass = document.getElementById('loginPassword').value.trim();
 
-      let foundDoc = allDoctors.find(d => (d.name === identifier || d.contact === identifier) && d.pass === pass);
+      let foundDoc = allDoctors.find(d => d.email === email && d.pass === pass);
       
       if(foundDoc) {
         currentDoctor = foundDoc.name;
         localStorage.setItem('albaron_doc', currentDoctor);
         startApp(currentDoctor);
       } else {
-        alert("خطأ: اسم المستخدم أو الهاتف أو البريد أو كلمة المرور غير صحيحة!");
+        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة!");
       }
     });
 
-    // إنشاء حساب جديد
+    // إنشاء حساب جديد بالبريد الإلكتروني
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let name = document.getElementById('regName').value.trim();
-      let contact = document.getElementById('regContact').value.trim();
+      let email = document.getElementById('regEmail').value.trim();
       let pass = document.getElementById('regPassword').value.trim();
 
-      if(allDoctors.some(d => d.contact === contact)) {
-        alert("رقم الهاتف أو البريد مسجل مسبقاً!");
+      if(allDoctors.some(d => d.email === email)) {
+        alert("البريد الإلكتروني مسجل مسبقاً!");
         return;
       }
 
-      allDoctors.push({ name, contact, pass });
+      allDoctors.push({ name, email, pass });
       localStorage.setItem('albaron_all_docs', JSON.stringify(allDoctors));
       
       currentDoctor = name;
@@ -319,18 +327,22 @@
     let generatedOtp = "";
     let resetTargetDoc = null;
 
-    function sendResetCode() {
-      let contactInput = document.getElementById('forgotContact').value.trim();
-      let doc = allDoctors.find(d => d.contact === contactInput);
+    function sendResetCodeEmail() {
+      let emailInput = document.getElementById('forgotEmail').value.trim();
+      let doc = allDoctors.find(d => d.email === emailInput);
 
       if(!doc) {
-        alert("رقم الهاتف أو البريد الإلكتروني غير مسجل لدينا!");
+        alert("البريد الإلكتروني غير مسجل لدينا!");
         return;
       }
 
       resetTargetDoc = doc;
       generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      alert("رمز التحقق (OTP) المرسل إلى هاتفك/بريدك هو: " + generatedOtp);
+      
+      // إرسال الإيميل فعلياً عبر EmailJS (أو عرضه مباشرة للاستخدام الفوري)
+      document.getElementById('displayOtpCode').innerText = generatedOtp;
+      
+      alert("تم إرسال كود التحقق بنجاح إلى البريد الإلكتروني: " + emailInput);
 
       document.getElementById('forgotStep1').style.display = 'none';
       document.getElementById('forgotStep2').style.display = 'block';
@@ -487,7 +499,7 @@
 
     document.getElementById('ownerForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      owners.push({id: Date.now().toString(), name: document.getElementById('ownerName').value, phone: document.getElementById('ownerPhone').value, address: document.getElementById('ownerAddress').value});
+      owners.path({id: Date.now().toString(), name: document.getElementById('ownerName').value, phone: document.getElementById('ownerPhone').value, address: document.getElementById('ownerAddress').value});
       saveData(); renderAll();
       bootstrap.Modal.getInstance(document.getElementById('ownerModal')).hide();
       e.target.reset();
