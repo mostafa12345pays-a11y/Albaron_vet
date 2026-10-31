@@ -588,7 +588,7 @@
       if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
     }
 
-    // حفظ المالك المباشر بدون إعادة تحميل الصفحة
+    // حفظ المالك المباشر وتحديث الجدول وإغلاق النافذة بدون إعادة تحميل الصفحة
     function saveOwnerDirect() {
       let name = document.getElementById('ownerName').value.trim();
       let phone = document.getElementById('ownerPhone').value.trim();
@@ -608,7 +608,7 @@
       if(modalObj) modalObj.hide();
     }
 
-    // حفظ الحالة المباشر بدون إعادة تحميل الصفحة
+    // حفظ الحالة المباشر
     function savePatientDirect() {
       let name = document.getElementById('patName').value.trim();
       let type = document.getElementById('patType').value.trim();
@@ -630,7 +630,7 @@
       if(modalObj) modalObj.hide();
     }
 
-    // حفظ الدواء المباشر بدون إعادة تحميل الصفحة
+    // حفظ الدواء المباشر
     function saveMedDirect() {
       let name = document.getElementById('medNameInput').value.trim();
       let price = Number(document.getElementById('medPriceInput').value);
