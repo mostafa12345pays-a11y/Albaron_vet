@@ -27,39 +27,33 @@
       justify-content: center;
       background: linear-gradient(135deg, #005b66 0%, #003d45 100%);
     }
-    @media print {
-      body * { visibility: hidden; }
-      #printableArea, #printableArea * { visibility: visible; }
-      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- شاشة تسجيل الدخول / إنشاء الحساب -->
+  <!-- شاشة تسجيل الدخول -->
   <div id="authScreen">
     <div class="card card-kpi p-4 shadow-lg" style="width: 100%; max-width: 450px;">
       <div class="text-center mb-4">
         <h3 style="color: var(--primary);" class="fw-bold"><i class="fa-solid fa-paw me-2"></i>Albaron Vet</h3>
-        <p class="text-muted">نظام إدارة العيادات البيطرية والتوثيق المحلي</p>
+        <p class="text-muted">نظام إدارة العيادات البيطرية</p>
       </div>
       <form id="authForm">
         <div class="mb-3">
           <label class="form-label fw-bold">اسم الطبيب / العيادة</label>
-          <input type="text" class="form-control" id="authName" placeholder="مثال: د. أحمد محمد" required>
+          <input type="text" class="form-control" id="authName" placeholder="مثال: د. أحمد" required>
         </div>
         <div class="mb-3">
-          <label class="form-label fw-bold">رقم الهاتف / البريد الإلكتروني</label>
-          <input type="text" class="form-control" id="authContact" placeholder="مثال: 01012345678 أو email@vet.com" required>
+          <label class="form-label fw-bold">رقم الهاتف أو البريد</label>
+          <input type="text" class="form-control" id="authContact" placeholder="مثال: 01012345678" required>
         </div>
-        <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5">دخول / إنشاء حساب خاص</button>
+        <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5">دخول للنظام</button>
       </form>
     </div>
   </div>
 
-  <!-- التطبيق الرئيسي (مخفي حتى يتم تسجيل الدخول) -->
+  <!-- التطبيق الرئيسي -->
   <div id="mainApp" style="display: none;">
-    <!-- Navbar -->
     <nav class="navbar navbar-custom px-4 py-3 shadow-sm">
       <div class="container-fluid d-flex justify-content-between align-items-center">
         <span class="navbar-brand text-white fw-bold fs-4">
@@ -67,7 +61,7 @@
         </span>
         <div class="d-flex align-items-center gap-2">
           <span class="badge bg-light text-dark p-2"><i class="fa-solid fa-user-md me-1"></i> <span id="currentDoctorName"></span></span>
-          <button class="btn btn-outline-light btn-sm" onclick="logoutDoctor()"><i class="fa-solid fa-right-from-bracket me-1"></i> خروج / تبديل الطبيب</button>
+          <button class="btn btn-outline-light btn-sm" onclick="logoutDoctor()"><i class="fa-solid fa-right-from-bracket me-1"></i> خروج</button>
         </div>
       </div>
     </nav>
@@ -78,59 +72,31 @@
         <div class="col-md-2 mb-3">
           <div class="card card-kpi p-3">
             <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist">
-              <button class="nav-link active text-start my-1" id="tab-dash" data-bs-toggle="pill" data-bs-target="#dash"><i class="fa-solid fa-chart-line me-2"></i>الرئيسية</button>
-              <button class="nav-link text-start my-1" id="tab-owners" data-bs-toggle="pill" data-bs-target="#owners"><i class="fa-solid fa-users me-2"></i>أصحاب الحالات</button>
-              <button class="nav-link text-start my-1" id="tab-patients" data-bs-toggle="pill" data-bs-target="#patients"><i class="fa-solid fa-dog me-2"></i>الحالات والحيوانات</button>
-              <button class="nav-link text-start my-1" id="tab-rx" data-bs-toggle="pill" data-bs-target="#rx"><i class="fa-solid fa-file-prescription me-2"></i>الروشتة والتشخيص</button>
-              <button class="nav-link text-start my-1" id="tab-pharmacy" data-bs-toggle="pill" data-bs-target="#pharmacy"><i class="fa-solid fa-pills me-2"></i>الصيدلية والمخزون</button>
+              <button class="nav-link active text-start my-1" data-bs-toggle="pill" data-bs-target="#dash"><i class="fa-solid fa-chart-line me-2"></i>الرئيسية</button>
+              <button class="nav-link text-start my-1" data-bs-toggle="pill" data-bs-target="#owners"><i class="fa-solid fa-users me-2"></i>أصحاب الحالات</button>
+              <button class="nav-link text-start my-1" data-bs-toggle="pill" data-bs-target="#patients"><i class="fa-solid fa-dog me-2"></i>الحالات والحيوانات</button>
+              <button class="nav-link text-start my-1" data-bs-toggle="pill" data-bs-target="#rx" id="link-rx"><i class="fa-solid fa-file-prescription me-2"></i>الروشتات</button>
+              <button class="nav-link text-start my-1" data-bs-toggle="pill" data-bs-target="#pharmacy"><i class="fa-solid fa-pills me-2"></i>الصيدلية والمخزون</button>
             </div>
           </div>
         </div>
 
-        <!-- المحتوى الرئيسي -->
+        <!-- المحتوى -->
         <div class="col-md-10">
-          <div class="tab-content" id="v-pills-tabContent">
+          <div class="tab-content">
             
             <!-- الرئيسية -->
             <div class="tab-pane fade show active" id="dash">
               <div class="row g-3">
-                <div class="col-md-3">
-                  <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-info">
-                    <h5>إجمالي الحالات</h5>
-                    <h2 id="kpiPatients">0</h2>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-success">
-                    <h5>أصحاب الحالات</h5>
-                    <h2 id="kpiOwners">0</h2>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-warning">
-                    <h5>الروشتات الصادرة</h5>
-                    <h2 id="kpiRx">0</h2>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="card card-kpi p-3 text-center bg-white border-start border-4 border-danger">
-                    <h5>أدوية منخفضة</h5>
-                    <h2 id="kpiLowStock">0</h2>
-                  </div>
-                </div>
+                <div class="col-md-3"><div class="card card-kpi p-3 text-center bg-white border-start border-4 border-info"><h5>إجمالي الحالات</h5><h2 id="kpiPatients">0</h2></div></div>
+                <div class="col-md-3"><div class="card card-kpi p-3 text-center bg-white border-start border-4 border-success"><h5>أصحاب الحالات</h5><h2 id="kpiOwners">0</h2></div></div>
+                <div class="col-md-3"><div class="card card-kpi p-3 text-center bg-white border-start border-4 border-warning"><h5>الروشتات الصادرة</h5><h2 id="kpiRx">0</h2></div></div>
+                <div class="col-md-3"><div class="card card-kpi p-3 text-center bg-white border-start border-4 border-danger"><h5>نقص مخزون</h5><h2 id="kpiLowStock">0</h2></div></div>
               </div>
-              
               <div class="card card-kpi mt-4 p-4">
-                <h5><i class="fa-solid fa-clock-rotate-left me-2"></i>أحدث الحالات المسجلة</h5>
+                <h5>أحدث الحالات المسجلة</h5>
                 <table class="table table-hover mt-3">
-                  <thead>
-                    <tr>
-                      <th>اسم الحيوان</th>
-                      <th>النوع</th>
-                      <th>اسم المالك</th>
-                      <th>الهاتف</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>اسم الحيوان</th><th>النوع</th><th>المالك</th><th>الهاتف</th></tr></thead>
                   <tbody id="recentPatientsTable"></tbody>
                 </table>
               </div>
@@ -140,103 +106,58 @@
             <div class="tab-pane fade" id="owners">
               <div class="card card-kpi p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h4><i class="fa-solid fa-user-gear me-2"></i>إدارة أصحاب الحالات</h4>
-                  <button class="btn btn-custom" onclick="openOwnerModal()"><i class="fa-solid fa-plus me-1"></i> إضافة مالك جديد</button>
+                  <h4>إدارة أصحاب الحالات</h4>
+                  <button class="btn btn-custom" onclick="openModal('ownerModal')"><i class="fa-solid fa-plus me-1"></i> إضافة مالك</button>
                 </div>
                 <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>الاسم</th>
-                      <th>رقم الهاتف / الواتساب</th>
-                      <th>العنوان</th>
-                      <th>خيارات</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>واتساب</th></tr></thead>
                   <tbody id="ownersTable"></tbody>
                 </table>
               </div>
             </div>
 
-            <!-- الحالات والحيوانات -->
+            <!-- الحالات -->
             <div class="tab-pane fade" id="patients">
               <div class="card card-kpi p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h4><i class="fa-solid fa-paw me-2"></i>سجل الحالات البيطرية</h4>
-                  <button class="btn btn-custom" onclick="openPatientModal()"><i class="fa-solid fa-plus me-1"></i> إضافة حالة جديدة</button>
+                  <h4>سجل الحالات والحيوانات</h4>
+                  <button class="btn btn-custom" onclick="openModal('patientModal')"><i class="fa-solid fa-plus me-1"></i> إضافة حالة</button>
                 </div>
                 <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>اسم الحيوان</th>
-                      <th>النوع / السلالة</th>
-                      <th>العمر</th>
-                      <th>الوزن</th>
-                      <th>المالك</th>
-                      <th>خيارات</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>اسم الحيوان</th><th>النوع</th><th>العمر</th><th>الوزن</th><th>المالك</th><th>إجراء</th></tr></thead>
                   <tbody id="patientsTable"></tbody>
                 </table>
               </div>
             </div>
 
-            <!-- الروشتة والتشخيص -->
+            <!-- الروشتات -->
             <div class="tab-pane fade" id="rx">
               <div class="card card-kpi p-4">
-                <h4><i class="fa-solid fa-notes-medical me-2"></i>إصدار روشتة وتصحيح تشخيص</h4>
+                <h4>إصدار روشتة وتصحيح تشخيص</h4>
                 <form id="rxForm" class="row g-3 mt-2">
-                  <div class="col-md-4">
-                    <label class="form-label">اختر الحالة</label>
-                    <select class="form-select" id="rxPatientSelect" required></select>
-                  </div>
-                  <div class="col-md-8">
-                    <label class="form-label">التشخيص الطبي</label>
-                    <input type="text" class="form-control" id="rxDiagnosis" placeholder="مثال: التهاب معوي حاد" required>
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label">الأدوية والجرعات المصروفة</label>
-                    <textarea class="form-control" id="rxMeds" rows="3" placeholder="مثال: 1. Amoxicillin - مرتين يومياً لمدة 5 أيام" required></textarea>
-                  </div>
-                  <div class="col-12">
-                    <button type="submit" class="btn btn-custom"><i class="fa-solid fa-save me-1"></i> حفظ الروشتة</button>
-                  </div>
+                  <div class="col-md-4"><label class="form-label">الحالة</label><select class="form-select" id="rxPatientSelect" required></select></div>
+                  <div class="col-md-8"><label class="form-label">التشخيص</label><input type="text" class="form-control" id="rxDiagnosis" required></div>
+                  <div class="col-12"><label class="form-label">الأدوية والجرعات</label><textarea class="form-control" id="rxMeds" rows="3" required></textarea></div>
+                  <div class="col-12"><button type="submit" class="btn btn-custom">حفظ وطباعة الروشتة</button></div>
                 </form>
-
                 <hr class="my-4">
-
                 <h5>الروشتات السابقة</h5>
                 <table class="table table-bordered mt-2">
-                  <thead>
-                    <tr>
-                      <th>التاريخ</th>
-                      <th>الحالة</th>
-                      <th>المالك</th>
-                      <th>التشخيص</th>
-                      <th>طباعة / إرسال</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>التاريخ</th><th>الحالة</th><th>التشخيص</th><th>خيارات</th></tr></thead>
                   <tbody id="rxTable"></tbody>
                 </table>
               </div>
             </div>
 
-            <!-- الصيدلية والمخزون -->
+            <!-- الصيدلية -->
             <div class="tab-pane fade" id="pharmacy">
               <div class="card card-kpi p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h4><i class="fa-solid fa-capsules me-2"></i>الصيدلية البيطرية وإدارة المخزون</h4>
-                  <button class="btn btn-custom" onclick="openMedModal()"><i class="fa-solid fa-plus me-1"></i> إضافة دواء جديد</button>
+                  <h4>الصيدلية والمخزون</h4>
+                  <button class="btn btn-custom" onclick="openModal('medModal')"><i class="fa-solid fa-plus me-1"></i> إضافة دواء</button>
                 </div>
                 <table class="table table-hover mt-3">
-                  <thead>
-                    <tr>
-                      <th>اسم الدواء</th>
-                      <th>السعر (ج.م)</th>
-                      <th>الكمية المتاحة (الجرد)</th>
-                      <th>الحالة</th>
-                      <th>التحكم في المخزون</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>الدواء</th><th>السعر</th><th>الكمية</th><th>الحالة</th><th>التحكم بالمخزون</th></tr></thead>
                   <tbody id="pharmacyTable"></tbody>
                 </table>
               </div>
@@ -248,202 +169,65 @@
     </div>
   </div>
 
-  <!-- مودال إضافة مالك -->
-  <div class="modal fade" id="ownerModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">إضافة مالك جديد</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="ownerForm">
-            <div class="mb-3">
-              <label class="form-label">اسم المالك</label>
-              <input type="text" class="form-control" id="ownerName" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">رقم الهاتف / الواتساب</label>
-              <input type="text" class="form-control" id="ownerPhone" placeholder="مثال: 201012345678" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">العنوان</label>
-              <input type="text" class="form-control" id="ownerAddress" required>
-            </div>
-            <button type="submit" class="btn btn-custom w-100">حفظ المالك</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Modal المالك -->
+  <div class="modal fade" id="ownerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة مالك</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="ownerForm"><div class="mb-3"><label>الاسم</label><input type="text" class="form-control" id="ownerName" required></div><div class="mb-3"><label>الهاتف</label><input type="text" class="form-control" id="ownerPhone" required></div><div class="mb-3"><label>العنوان</label><input type="text" class="form-control" id="ownerAddress" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
 
-  <!-- مودال إضافة حيوان -->
-  <div class="modal fade" id="patientModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">إضافة حالة حيوان جديد</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="patientForm">
-            <div class="mb-3">
-              <label class="form-label">اسم الحيوان</label>
-              <input type="text" class="form-control" id="patName" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">النوع والسلالة</label>
-              <input type="text" class="form-control" id="patType" placeholder="مثال: كلب - Golden" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">العمر</label>
-              <input type="text" class="form-control" id="patAge" placeholder="مثال: سنتين" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">الوزن</label>
-              <input type="text" class="form-control" id="patWeight" placeholder="مثال: 25 كجم" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">اختر المالك</label>
-              <select class="form-select" id="patOwnerSelect" required></select>
-            </div>
-            <button type="submit" class="btn btn-custom w-100">حفظ الحالة</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Modal الحيوان -->
+  <div class="modal fade" id="patientModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة حالة</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="patientForm"><div class="mb-3"><label>اسم الحيوان</label><input type="text" class="form-control" id="patName" required></div><div class="mb-3"><label>النوع</label><input type="text" class="form-control" id="patType" required></div><div class="mb-3"><label>العمر</label><input type="text" class="form-control" id="patAge" required></div><div class="mb-3"><label>الوزن</label><input type="text" class="form-control" id="patWeight" required></div><div class="mb-3"><label>المالك</label><select class="form-select" id="patOwnerSelect" required></select></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
 
-  <!-- مودال إضافة دواء للمخزون -->
-  <div class="modal fade" id="medModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">إضافة دواء للمخزون</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="medForm">
-            <div class="mb-3">
-              <label class="form-label">اسم الدواء</label>
-              <input type="text" class="form-control" id="medNameInput" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">السعر (ج.م)</label>
-              <input type="number" class="form-control" id="medPriceInput" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">الكمية المتاحة (الجرد)</label>
-              <input type="number" class="form-control" id="medQtyInput" required>
-            </div>
-            <button type="submit" class="btn btn-custom w-100">حفظ الدواء</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Modal الدواء -->
+  <div class="modal fade" id="medModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة دواء</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="medForm"><div class="mb-3"><label>اسم الدواء</label><input type="text" class="form-control" id="medNameInput" required></div><div class="mb-3"><label>السعر</label><input type="number" class="form-control" id="medPriceInput" required></div><div class="mb-3"><label>الكمية</label><input type="number" class="form-control" id="medQtyInput" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
 
-  <!-- معاينة الروشتة -->
-  <div class="modal fade" id="printRxModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">الروشتة الطبية - Albaron Vet</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="printableArea">
-          <div class="text-center border-bottom pb-3 mb-3">
-            <h2 style="color: var(--primary);">عيادة البارون البيطرية - Albaron Vet</h2>
-            <p class="mb-0" id="printDoctorName">إشراف: د. أحمد</p>
-          </div>
-          <div class="row mb-3">
-            <div class="col-6"><strong>اسم الحالة:</strong> <span id="pRxPatient"></span></div>
-            <div class="col-6"><strong>اسم المالك:</strong> <span id="pRxOwner"></span></div>
-            <div class="col-6"><strong>التاريخ:</strong> <span id="pRxDate"></span></div>
-            <div class="col-6"><strong>الهاتف:</strong> <span id="pRxPhone"></span></div>
-          </div>
-          <div class="mb-3">
-            <strong>التشخيص الطبي:</strong>
-            <p id="pRxDiagnosis" class="bg-light p-2 rounded"></p>
-          </div>
-          <div class="mb-3">
-            <strong>الأدوية والجرعات:</strong>
-            <pre id="pRxMeds" class="bg-light p-3 rounded" style="font-family: inherit; font-size: 1rem;"></pre>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-success" onclick="sendWhatsApp()"><i class="fa-brands fa-whatsapp me-1"></i> إرسال عبر الواتساب</button>
-          <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> طباعة (PDF)</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS Bundle (يجب أن يكون في الأسفل لضمان عمل كافة النوافذ والأزرار) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
   <script>
     let currentDoctor = localStorage.getItem('albaron_doc') || "";
-    let currentContact = localStorage.getItem('albaron_contact') || "";
-
-    if (currentDoctor) {
-      startApp(currentDoctor);
-    }
+    if (currentDoctor) startApp(currentDoctor);
 
     document.getElementById('authForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      let docName = document.getElementById('authName').value.trim();
-      let docContact = document.getElementById('authContact').value.trim();
-      if(docName && docContact) {
-        currentDoctor = docName;
-        currentContact = docContact;
+      let name = document.getElementById('authName').value.trim();
+      if(name) {
+        currentDoctor = name;
         localStorage.setItem('albaron_doc', currentDoctor);
-        localStorage.setItem('albaron_contact', currentContact);
         startApp(currentDoctor);
       }
     });
 
-    function startApp(docName) {
+    function startApp(name) {
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'block';
-      document.getElementById('currentDoctorName').innerText = docName;
+      document.getElementById('currentDoctorName').innerText = name;
       loadData();
     }
 
-    window.logoutDoctor = () => {
+    function logoutDoctor() {
       localStorage.removeItem('albaron_doc');
-      localStorage.removeItem('albaron_contact');
       location.reload();
-    };
+    }
 
-    let owners = [];
-    let patients = [];
-    let rxs = [];
-    let meds = [];
+    let owners = [], patients = [], rxs = [], meds = [];
 
     function loadData() {
-      let docKey = "_" + currentDoctor.replace(/\s+/g, '_');
-      owners = JSON.parse(localStorage.getItem('owners' + docKey)) || [
-        { id: "1", name: "أحمد محمد", phone: "201012345678", address: "القاهرة" }
-      ];
-      patients = JSON.parse(localStorage.getItem('patients' + docKey)) || [
-        { id: "1", name: "Bella", type: "كلب - Golden", age: "سنتين", weight: "25 كجم", ownerId: "1" }
-      ];
-      rxs = JSON.parse(localStorage.getItem('rxs' + docKey)) || [];
-      meds = JSON.parse(localStorage.getItem('meds' + docKey)) || [
-        { id: "m1", name: "Amoxicillin 250mg", price: 150, qty: 18 },
-        { id: "m2", name: "Heartgard Plus", price: 320, qty: 3 },
-        { id: "m3", name: "Frontline Spot-On", price: 210, qty: 12 }
-      ];
+      let key = "_" + currentDoctor.replace(/\s+/g, '_');
+      owners = JSON.parse(localStorage.getItem('owners' + key)) || [{id:"1", name:"أحمد محمد", phone:"01012345678", address:"القاهرة"}];
+      patients = JSON.parse(localStorage.getItem('patients' + key)) || [{id:"1", name:"Bella", type:"كلب", age:"سنتين", weight:"20 كجم", ownerId:"1"}];
+      rxs = JSON.parse(localStorage.getItem('rxs' + key)) || [];
+      meds = JSON.parse(localStorage.getItem('meds' + key)) || [{id:"m1", name:"Amoxicillin", price:150, qty:10}];
       renderAll();
     }
 
     function saveData() {
-      let docKey = "_" + currentDoctor.replace(/\s+/g, '_');
-      localStorage.setItem('owners' + docKey, JSON.stringify(owners));
-      localStorage.setItem('patients' + docKey, JSON.stringify(patients));
-      localStorage.setItem('rxs' + docKey, JSON.stringify(rxs));
-      localStorage.setItem('meds' + docKey, JSON.stringify(meds));
+      let key = "_" + currentDoctor.replace(/\s+/g, '_');
+      localStorage.setItem('owners' + key, JSON.stringify(owners));
+      localStorage.setItem('patients' + key, JSON.stringify(patients));
+      localStorage.setItem('rxs' + key, JSON.stringify(rxs));
+      localStorage.setItem('meds' + key, JSON.stringify(meds));
+    }
+
+    function openModal(modalId) {
+      let modalElement = document.getElementById(modalId);
+      let modalInstance = new bootstrap.Modal(modalElement);
+      modalInstance.show();
     }
 
     function renderAll() {
@@ -452,179 +236,64 @@
       document.getElementById('kpiRx').innerText = rxs.length;
       document.getElementById('kpiLowStock').innerText = meds.filter(m => m.qty <= 5).length;
 
-      let recentHtml = '';
-      patients.slice(-5).forEach(p => {
-        let owner = owners.find(o => o.id == p.ownerId) || {};
-        recentHtml += `<tr><td>${p.name}</td><td>${p.type}</td><td>${owner.name || '-'}</td><td>${owner.phone || '-'}</td></tr>`;
-      });
-      document.getElementById('recentPatientsTable').innerHTML = recentHtml;
-
-      let ownerHtml = '';
-      owners.forEach(o => {
-        ownerHtml += `<tr><td>${o.name}</td><td>${o.phone}</td><td>${o.address}</td><td><button class="btn btn-sm btn-outline-success" onclick="sendDirectWA('${o.phone}')"><i class="fa-brands fa-whatsapp"></i></button></td></tr>`;
-      });
-      document.getElementById('ownersTable').innerHTML = ownerHtml;
-
-      let patientHtml = '';
-      patients.forEach(p => {
-        let owner = owners.find(o => o.id == p.ownerId) || {};
-        patientHtml += `<tr><td>${p.name}</td><td>${p.type}</td><td>${p.age}</td><td>${p.weight}</td><td>${owner.name || '-'}</td><td><button class="btn btn-sm btn-custom" onclick="selectRxPatient('${p.id}')">روشتة جديدة</button></td></tr>`;
-      });
-      document.getElementById('patientsTable').innerHTML = patientHtml;
-
-      let selectHtml = '<option value="">اختر الحالة...</option>';
-      patients.forEach(p => {
-        let owner = owners.find(o => o.id == p.ownerId) || {};
-        selectHtml += `<option value="${p.id}">${p.name} (مالك: ${owner.name || ''})</option>`;
-      });
-      document.getElementById('rxPatientSelect').innerHTML = selectHtml;
+      document.getElementById('ownersTable').innerHTML = owners.map(o => `<tr><td>${o.name}</td><td>${o.phone}</td><td>${o.address}</td><td><a href="https://wa.me/${o.phone}" target="_blank" class="btn btn-sm btn-success"><i class="fa-brands fa-whatsapp"></i></a></td></tr>`).join('');
+      document.getElementById('patientsTable').innerHTML = patients.map(p => {
+        let own = owners.find(o => o.id == p.ownerId) || {};
+        return `<tr><td>${p.name}</td><td>${p.type}</td><td>${p.age}</td><td>${p.weight}</td><td>${own.name || '-'}</td><td><button class="btn btn-sm btn-custom" onclick="selectRx('${p.id}')">روشتة</button></td></tr>`;
+      }).join('');
+      
+      document.getElementById('rxPatientSelect').innerHTML = '<option value="">اختر الحالة...</option>' + patients.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
       document.getElementById('patOwnerSelect').innerHTML = '<option value="">اختر المالك...</option>' + owners.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+      
+      document.getElementById('rxTable').innerHTML = rxs.map(r => {
+        let p = patients.find(x => x.id == r.patientId) || {};
+        return `<tr><td>${r.date}</td><td>${p.name || '-'}</td><td>${r.diagnosis}</td><td><button class="btn btn-sm btn-primary" onclick="alert('${r.meds}')">عرض</button></td></tr>`;
+      }).join('');
 
-      let rxHtml = '';
-      rxs.forEach(r => {
-        let pat = patients.find(p => p.id == r.patientId) || {};
-        let own = owners.find(o => o.id == pat.ownerId) || {};
-        rxHtml += `<tr>
-          <td>${r.date || 'اليوم'}</td>
-          <td>${pat.name || '-'}</td>
-          <td>${own.name || '-'}</td>
-          <td>${r.diagnosis}</td>
-          <td><button class="btn btn-sm btn-primary" onclick="openPrintModal('${r.id}')"><i class="fa-solid fa-print"></i> معاينة / إرسال</button></td>
-        </tr>`;
-      });
-      document.getElementById('rxTable').innerHTML = rxHtml;
-
-      let medHtml = '';
-      meds.forEach(m => {
-        let status = m.qty <= 5 ? '<span class="badge bg-danger">⚠️ نقص مخزون</span>' : '<span class="badge bg-success">متوفر</span>';
-        medHtml += `<tr>
-          <td>${m.name}</td>
-          <td>${m.price} ج.م</td>
-          <td><strong>${m.qty}</strong></td>
-          <td>${status}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-danger me-1" onclick="updateMedQty('${m.id}', -1)"><i class="fa-solid fa-minus"></i> بيع / نقص</button>
-            <button class="btn btn-sm btn-outline-success" onclick="updateMedQty('${m.id}', 1)"><i class="fa-solid fa-plus"></i> زيادة</button>
-          </td>
-        </tr>`;
-      });
-      document.getElementById('pharmacyTable').innerHTML = medHtml;
+      document.getElementById('pharmacyTable').innerHTML = meds.map(m => `<tr><td>${m.name}</td><td>${m.price} ج.م</td><td>${m.qty}</td><td>${m.qty <= 5 ? '<span class="badge bg-danger">منخفض</span>' : '<span class="badge bg-success">متوفر</span>'}</td><td><button class="btn btn-sm btn-outline-danger" onclick="updateQty('${m.id}', -1)">-</button> <button class="btn btn-sm btn-outline-success" onclick="updateQty('${m.id}', 1)">+</button></td></tr>`).join('');
     }
 
-    window.updateMedQty = (id, change) => {
-      let med = meds.find(m => m.id == id);
-      if(med) {
-        med.qty += change;
-        if(med.qty < 0) med.qty = 0;
-        saveData();
-        renderAll();
-      }
-    };
-
-    window.openMedModal = () => {
-      new bootstrap.Modal(document.getElementById('medModal')).show();
-    };
-
-    document.getElementById('medForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      let newM = {
-        id: Date.now().toString(),
-        name: document.getElementById('medNameInput').value,
-        price: Number(document.getElementById('medPriceInput').value),
-        qty: Number(document.getElementById('medQtyInput').value)
-      };
-      meds.push(newM);
-      saveData();
-      renderAll();
-      bootstrap.Modal.getInstance(document.getElementById('medModal')).hide();
-      document.getElementById('medForm').reset();
-    });
-
-    window.openOwnerModal = () => {
-      new bootstrap.Modal(document.getElementById('ownerModal')).show();
-    };
+    function updateQty(id, val) {
+      let m = meds.find(x => x.id == id);
+      if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
+    }
 
     document.getElementById('ownerForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      let newO = {
-        id: Date.now().toString(),
-        name: document.getElementById('ownerName').value,
-        phone: document.getElementById('ownerPhone').value,
-        address: document.getElementById('ownerAddress').value
-      };
-      owners.push(newO);
-      saveData();
-      renderAll();
+      owners.push({id: Date.now().toString(), name: document.getElementById('ownerName').value, phone: document.getElementById('ownerPhone').value, address: document.getElementById('ownerAddress').value});
+      saveData(); renderAll();
       bootstrap.Modal.getInstance(document.getElementById('ownerModal')).hide();
-      document.getElementById('ownerForm').reset();
+      e.target.reset();
     });
-
-    window.openPatientModal = () => {
-      new bootstrap.Modal(document.getElementById('patientModal')).show();
-    };
 
     document.getElementById('patientForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      let newP = {
-        id: Date.now().toString(),
-        name: document.getElementById('patName.value' || 'patName').value,
-        type: document.getElementById('patType').value,
-        age: document.getElementById('patAge').value,
-        weight: document.getElementById('patWeight').value,
-        ownerId: document.getElementById('patOwnerSelect').value
-      };
-      patients.push(newP);
-      saveData();
-      renderAll();
+      patients.push({id: Date.now().toString(), name: document.getElementById('patName').value, type: document.getElementById('patType').value, age: document.getElementById('patAge').value, weight: document.getElementById('patWeight').value, ownerId: document.getElementById('patOwnerSelect').value});
+      saveData(); renderAll();
       bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
-      document.getElementById('patientForm').reset();
+      e.target.reset();
+    });
+
+    document.getElementById('medForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      meds.push({id: Date.now().toString(), name: document.getElementById('medNameInput').value, price: Number(document.getElementById('medPriceInput').value), qty: Number(document.getElementById('medQtyInput').value)});
+      saveData(); renderAll();
+      bootstrap.Modal.getInstance(document.getElementById('medModal')).hide();
+      e.target.reset();
     });
 
     document.getElementById('rxForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      let newRx = {
-        id: Date.now().toString(),
-        patientId: document.getElementById('rxPatientSelect').value,
-        diagnosis: document.getElementById('rxDiagnosis').value,
-        meds: document.getElementById('rxMeds').value,
-        date: new Date().toISOString().split('T')[0]
-      };
-      rxs.push(newRx);
-      saveData();
-      document.getElementById('rxForm').reset();
-      renderAll();
-      openPrintModal(newRx.id);
+      rxs.push({id: Date.now().toString(), patientId: document.getElementById('rxPatientSelect').value, diagnosis: document.getElementById('rxDiagnosis').value, meds: document.getElementById('rxMeds').value, date: new Date().toLocaleDateString()});
+      saveData(); renderAll();
+      e.target.reset();
+      alert("تم حفظ الروشتة بنجاح!");
     });
 
-    window.openPrintModal = (rxId) => {
-      let activeRx = rxs.find(r => r.id == rxId);
-      if(!activeRx) return;
-      let pat = patients.find(p => p.id == activeRx.patientId) || {};
-      let own = owners.find(o => o.id == pat.ownerId) || {};
-
-      document.getElementById('printDoctorName').innerText = "إشراف: " + currentDoctor;
-      document.getElementById('pRxPatient').innerText = pat.name || '';
-      document.getElementById('pRxOwner').innerText = own.name || '';
-      document.getElementById('pRxDate').innerText = activeRx.date || 'اليوم';
-      document.getElementById('pRxPhone').innerText = own.phone || '';
-      document.getElementById('pRxDiagnosis').innerText = activeRx.diagnosis;
-      document.getElementById('pRxMeds').innerText = activeRx.meds;
-
-      new bootstrap.Modal(document.getElementById('printRxModal')).show();
-    };
-
-    window.sendWhatsApp = () => {
-      alert("تمت الإعدادات للطباعة أو الإرسال");
-    };
-
-    window.sendDirectWA = (phone) => {
-      window.open(`https://wa.me/${phone}`, '_blank');
-    };
-
-    window.selectRxPatient = (pId) => {
-      document.getElementById('tab-rx').click();
-      document.getElementById('rxPatientSelect').value = pId;
-    };
+    function selectRx(id) {
+      document.getElementById('link-rx').click();
+      document.getElementById('rxPatientSelect').value = id;
+    }
   </script>
 </body>
 </html>
