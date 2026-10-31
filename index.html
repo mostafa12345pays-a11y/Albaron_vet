@@ -7,7 +7,8 @@
   <meta name="google-site-verification" content="aAudum6THThu3TCTAIBMzgcTnMhfbilhGpX8DqBKAyI" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <!-- مكتبة Supabase للاتصال السحابي -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --primary: #005b66;
@@ -44,12 +45,11 @@
   <div id="authScreen">
     <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 480px;">
       <div class="mb-3">
-        <!-- أيقونة احترافية بديلة للوجو لضمان عدم تعطل الصفحة أبداً -->
         <div class="d-inline-block">
           <i class="fa-solid fa-paw logo-icon shadow-sm"></i>
         </div>
         <h3 style="color: var(--primary);" class="fw-bold mt-2">Albaron Vet</h3>
-        <p class="text-muted small">نظام إدارة العيادات البيطرية المخصص</p>
+        <p class="text-muted small">نظام إدارة العيادات البيطرية السحابي</p>
       </div>
 
       <!-- أزرار التبديل -->
@@ -69,10 +69,7 @@
             <label class="form-label fw-bold">كلمة المرور</label>
             <input type="password" class="form-control" id="loginPassword" placeholder="ادخل كلمة المرور" required>
           </div>
-          <div class="text-end mb-3">
-            <a href="#" class="text-decoration-none small text-muted" onclick="switchTab('forgot')">نسيت كلمة المرور؟</a>
-          </div>
-          <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5">دخول إلى النظام</button>
+          <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5 mt-2">دخول إلى النظام</button>
         </form>
       </div>
 
@@ -81,7 +78,7 @@
         <form id="registerForm">
           <div class="mb-3 text-start">
             <label class="form-label fw-bold">اسم الطبيب / العيادة</label>
-            <input type="text" class="form-control" id="regName" placeholder="مثال: د. أحمد" required>
+            <input type="text" class="form-control" id="regName" placeholder="مثال: د. مصطفى" required>
           </div>
           <div class="mb-3 text-start">
             <label class="form-label fw-bold">البريد الإلكتروني</label>
@@ -95,34 +92,6 @@
         </form>
       </div>
 
-      <!-- استعادة كلمة المرور وإرسال الكود للإيميل -->
-      <div id="forgotSection" style="display: none;">
-        <div id="forgotStep1">
-          <p class="text-muted small text-start">أدخل بريدك الإلكتروني المسجل وسنرسل لك كود التحقق (OTP) مباشرة عبر البريد.</p>
-          <div class="mb-3 text-start">
-            <label class="form-label fw-bold">البريد الإلكتروني المسجل</label>
-            <input type="email" class="form-control" id="forgotEmail" placeholder="example@vet.com" required>
-          </div>
-          <button type="button" class="btn btn-custom w-100 py-2 fw-bold mb-2" onclick="sendResetCodeEmail()">إرسال الكود إلى البريد</button>
-          <button type="button" class="btn btn-outline-secondary w-100 btn-sm" onclick="switchTab('login')">العودة لتسجيل الدخول</button>
-        </div>
-
-        <div id="forgotStep2" style="display: none;">
-          <div class="alert alert-info p-2 small mb-3">
-            تم إرسال كود التحقق إلى بريدك الإلكتروني بنجاح! (للتجربة الفورية، الكود هو: <span id="displayOtpCode" class="fs-4 fw-bold text-danger"></span>)
-          </div>
-          <div class="mb-3 text-start">
-            <label class="form-label fw-bold">أدخل كود التحقق المكون من 4 أرقام</label>
-            <input type="text" class="form-control text-center fs-4 tracking-widest" id="resetCodeInput" maxlength="4" required>
-          </div>
-          <div class="mb-3 text-start">
-            <label class="form-label fw-bold">كلمة المرور الجديدة</label>
-            <input type="password" class="form-control" id="newPasswordInput" placeholder="ادخل كلمة السر الجديدة" required>
-          </div>
-          <button type="button" class="btn btn-custom w-100 py-2 fw-bold" onclick="verifyAndResetPassword()">تغيير كلمة المرور والدخول</button>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -132,7 +101,7 @@
       <div class="container-fluid d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
           <i class="fa-solid fa-paw fs-4 text-white bg-dark p-2 rounded"></i>
-          <span class="navbar-brand text-white fw-bold fs-4">Albaron Vet</span>
+          <span class="navbar-brand text-white fw-bold fs-4">Albaron Vet (السحابي)</span>
         </div>
         <div class="d-flex align-items-center gap-2">
           <span class="badge bg-light text-dark p-2"><i class="fa-solid fa-user-md me-1"></i> <span id="currentDoctorName"></span></span>
@@ -169,9 +138,9 @@
                 <div class="col-md-3"><div class="card card-kpi p-3 text-center bg-white border-start border-4 border-danger"><h5>نقص مخزون</h5><h2 id="kpiLowStock">0</h2></div></div>
               </div>
               <div class="card card-kpi mt-4 p-4">
-                <h5>أحدث الحالات المسجلة</h5>
+                <h5>أحدث الحالات المسجلة سحابياً</h5>
                 <table class="table table-hover mt-3">
-                  <thead><tr><th>اسم الحيوان</th><th>النوع</th><th>المالك</th><th>الهاتف</th></tr></thead>
+                  <thead><tr><th>اسم الحيوان</th><th>النوع</th><th>المالك</th></tr></thead>
                   <tbody id="recentPatientsTable"></tbody>
                 </table>
               </div>
@@ -199,7 +168,7 @@
                   <button class="btn btn-custom" onclick="openModal('patientModal')"><i class="fa-solid fa-plus me-1"></i> إضافة حالة</button>
                 </div>
                 <table class="table table-striped">
-                  <thead><tr><th>اسم الحيوان</th><th>النوع</th><th>العمر</th><th>الوزن</th><th>المالك</th><th>إجراءات / حذف</th></tr></thead>
+                  <thead><tr><th>اسم الحيوان</th><th>النوع</th><th>العمر</th><th>الوزن</th><th>إجراءات / حذف</th></tr></thead>
                   <tbody id="patientsTable"></tbody>
                 </table>
               </div>
@@ -209,21 +178,15 @@
             <div class="tab-pane fade" id="rx">
               <div class="card card-kpi p-4">
                 <h4>إصدار روشتة وتصحيح تشخيص</h4>
-                <form id="rxForm" class="row g-3 mt-2">
+                <div class="row g-3 mt-2">
                   <div class="col-md-4">
-                    <label class="form-label">اسم الحالة (اكتبها يدوياً)</label>
-                    <input type="text" class="form-control" id="rxPatientName" placeholder="مثال: Bella" required>
+                    <label class="form-label">اسم الحالة</label>
+                    <input type="text" class="form-control" id="rxPatientName" placeholder="مثال: Bella">
                   </div>
-                  <div class="col-md-8"><label class="form-label">التشخيص</label><input type="text" class="form-control" id="rxDiagnosis" required></div>
-                  <div class="col-12"><label class="form-label">الأدوية والجرعات</label><textarea class="form-control" id="rxMeds" rows="3" required></textarea></div>
-                  <div class="col-12"><button type="submit" class="btn btn-custom">حفظ الروشتة</button></div>
-                </form>
-                <hr class="my-4">
-                <h5>الروشتات السابقة</h5>
-                <table class="table table-bordered mt-2">
-                  <thead><tr><th>التاريخ</th><th>الحالة</th><th>التشخيص</th><th>خيارات والحذف</th></tr></thead>
-                  <tbody id="rxTable"></tbody>
-                </table>
+                  <div class="col-md-8"><label class="form-label">التشخيص</label><input type="text" class="form-control" id="rxDiagnosis"></div>
+                  <div class="col-12"><label class="form-label">الأدوية والجرعات</label><textarea class="form-control" id="rxMeds" rows="3"></textarea></div>
+                  <div class="col-12"><button type="button" class="btn btn-custom" onclick="saveRxDataDirect()">حفظ الروشتة</button></div>
+                </div>
               </div>
             </div>
 
@@ -235,7 +198,7 @@
                   <button class="btn btn-custom" onclick="openModal('medModal')"><i class="fa-solid fa-plus me-1"></i> إضافة دواء</button>
                 </div>
                 <table class="table table-hover mt-3">
-                  <thead><tr><th>الدواء</th><th>السعر</th><th>الكمية</th><th>الحالة</th><th>التحكم بالمخزون والحذف</th></tr></thead>
+                  <thead><tr><th>الدواء</th><th>السعر</th><th>الكمية</th><th>التحكم والحذف</th></tr></thead>
                   <tbody id="pharmacyTable"></tbody>
                 </table>
               </div>
@@ -248,126 +211,98 @@
   </div>
 
   <!-- Modal المالك -->
-  <div class="modal fade" id="ownerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة مالك</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="ownerForm"><div class="mb-3"><label>الاسم</label><input type="text" class="form-control" id="ownerName" required></div><div class="mb-3"><label>الهاتف</label><input type="text" class="form-control" id="ownerPhone" required></div><div class="mb-3"><label>العنوان</label><input type="text" class="form-control" id="ownerAddress" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
+  <div class="modal fade" id="ownerModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة مالك سحابياً</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">الاسم</label><input type="text" class="form-control" id="ownerName"></div>
+          <div class="mb-3"><label class="form-label">الهاتف</label><input type="text" class="form-control" id="ownerPhone"></div>
+          <div class="mb-3"><label class="form-label">العنوان</label><input type="text" class="form-control" id="ownerAddress"></div>
+          <button type="button" class="btn btn-custom w-100" onclick="saveOwnerDirect()">حفظ في قاعدة البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal الحيوان -->
-  <div class="modal fade" id="patientModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة حالة</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="patientForm"><div class="mb-3"><label>اسم الحيوان</label><input type="text" class="form-control" id="patName" required></div><div class="mb-3"><label>النوع</label><input type="text" class="form-control" id="patType" required></div><div class="mb-3"><label>العمر</label><input type="text" class="form-control" id="patAge" required></div><div class="mb-3"><label>الوزن</label><input type="text" class="form-control" id="patWeight" required></div><div class="mb-3"><label>اسم المالك (اكتبه يدوياً)</label><input type="text" class="form-control" id="patOwnerInput" placeholder="مثال: أحمد محمد" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
+  <div class="modal fade" id="patientModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة حالة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">اسم الحيوان</label><input type="text" class="form-control" id="patName"></div>
+          <div class="mb-3"><label class="form-label">النوع</label><input type="text" class="form-control" id="patType"></div>
+          <div class="mb-3"><label class="form-label">العمر</label><input type="text" class="form-control" id="patAge"></div>
+          <div class="mb-3"><label class="form-label">الوزن</label><input type="text" class="form-control" id="patWeight"></div>
+          <button type="button" class="btn btn-custom w-100" onclick="savePatientDirect()">حفظ في قاعدة البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal الدواء -->
-  <div class="modal fade" id="medModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة دواء</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="medForm"><div class="mb-3"><label>اسم الدواء</label><input type="text" class="form-control" id="medNameInput" required></div><div class="mb-3"><label>السعر</label><input type="number" class="form-control" id="medPriceInput" required></div><div class="mb-3"><label>الكمية</label><input type="number" class="form-control" id="medQtyInput" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
+  <div class="modal fade" id="medModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة دواء</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">اسم الدواء</label><input type="text" class="form-control" id="medNameInput"></div>
+          <div class="mb-3"><label class="form-label">السعر</label><input type="number" class="form-control" id="medPriceInput"></div>
+          <div class="mb-3"><label class="form-label">الكمية</label><input type="number" class="form-control" id="medQtyInput"></div>
+          <button type="button" class="btn btn-custom w-100" onclick="saveMedDirect()">حفظ في قاعدة البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    let allDoctors = JSON.parse(localStorage.getItem('albaron_all_docs')) || [
-      { name: "د. أحمد", email: "admin@vet.com", pass: "1234" }
-    ];
+    // --- معلومات الاتصال بقاعدة بيانات Supabase الخاصة بك ---
+    const SUPABASE_URL = 'https://qyttmnuuhcsxtxcwhtgd.supabase.co';
+    const SUPABASE_ANON_KEY = 'ضع_مفتاح_Publishable_Key_'sb_publishable_1w3LedC6KdcIyQIor4hOiQ_A1CUKeuN'
 
-    function switchTab(mode) {
-      document.getElementById('loginSection').style.display = (mode === 'login') ? 'block' : 'none';
-      document.getElementById('registerSection').style.display = (mode === 'register') ? 'block' : 'none';
-      document.getElementById('forgotSection').style.display = (mode === 'forgot') ? 'block' : 'none';
-      
-      let btnLogin = document.getElementById('tabBtnLogin');
-      let btnReg = document.getElementById('tabBtnRegister');
-
-      if(mode === 'login') {
-        btnLogin.className = "btn btn-dark flex-fill fw-bold";
-        btnReg.className = "btn btn-outline-dark flex-fill fw-bold";
-      } else if(mode === 'register') {
-        btnReg.className = "btn btn-dark flex-fill fw-bold";
-        btnLogin.className = "btn btn-outline-dark flex-fill fw-bold";
-      } else {
-        btnLogin.className = "btn btn-outline-dark flex-fill fw-bold";
-        btnReg.className = "btn btn-outline-dark flex-fill fw-bold";
-      }
-      
-      if(mode === 'forgot') {
-        document.getElementById('forgotStep1').style.display = 'block';
-        document.getElementById('forgotStep2').style.display = 'none';
-      }
-    }
+    const { createClient } = supabase;
+    const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentDoctor = localStorage.getItem('albaron_doc') || "";
     if (currentDoctor) startApp(currentDoctor);
 
-    // تسجيل الدخول بالبريد الإلكتروني
+    function switchTab(mode) {
+      document.getElementById('loginSection').style.display = (mode === 'login') ? 'block' : 'none';
+      document.getElementById('registerSection').style.display = (mode === 'register') ? 'block' : 'none';
+    }
+
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let email = document.getElementById('loginEmail').value.trim();
-      let pass = document.getElementById('loginPassword').value.trim();
-
-      let foundDoc = allDoctors.find(d => d.email === email && d.pass === pass);
-      
-      if(foundDoc) {
-        currentDoctor = foundDoc.name;
-        localStorage.setItem('albaron_doc', currentDoctor);
-        startApp(currentDoctor);
-      } else {
-        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة! تأكد من إنشاء الحساب أولاً إن لم تقم بذلك.");
-      }
+      currentDoctor = email;
+      localStorage.setItem('albaron_doc', currentDoctor);
+      startApp(currentDoctor);
     });
 
-    // إنشاء حساب جديد بالبريد الإلكتروني
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let name = document.getElementById('regName').value.trim();
-      let email = document.getElementById('regEmail').value.trim();
-      let pass = document.getElementById('regPassword').value.trim();
-
-      if(allDoctors.some(d => d.email === email)) {
-        alert("البريد الإلكتروني مسجل مسبقاً!");
-        return;
-      }
-
-      allDoctors.push({ name, email, pass });
-      localStorage.setItem('albaron_all_docs', JSON.stringify(allDoctors));
-      
       currentDoctor = name;
       localStorage.setItem('albaron_doc', currentDoctor);
       startApp(currentDoctor);
     });
 
-    let generatedOtp = "";
-    let resetTargetDoc = null;
-
-    function sendResetCodeEmail() {
-      let emailInput = document.getElementById('forgotEmail').value.trim();
-      let doc = allDoctors.find(d => d.email === emailInput);
-
-      if(!doc) {
-        alert("البريد الإلكتروني غير مسجل لدينا!");
-        return;
-      }
-
-      resetTargetDoc = doc;
-      generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      
-      document.getElementById('displayOtpCode').innerText = generatedOtp;
-      alert("تم إرسال كود التحقق بنجاح إلى البريد الإلكتروني: " + emailInput);
-
-      document.getElementById('forgotStep1').style.display = 'none';
-      document.getElementById('forgotStep2').style.display = 'block';
-    }
-
-    function verifyAndResetPassword() {
-      let enteredCode = document.getElementById('resetCodeInput').value.trim();
-      let newPass = document.getElementById('newPasswordInput').value.trim();
-
-      if(enteredCode === generatedOtp && newPass) {
-        resetTargetDoc.pass = newPass;
-        localStorage.setItem('albaron_all_docs', JSON.stringify(allDoctors));
-        alert("تم تغيير كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.");
-        switchTab('login');
-      } else {
-        alert("كود التحقق خاطئ أو كلمة المرور فارغة!");
-      }
-    }
-
     function startApp(name) {
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'block';
       document.getElementById('currentDoctorName').innerText = name;
-      loadData();
+      loadDataFromSupabase();
     }
 
     function logoutDoctor() {
@@ -375,23 +310,23 @@
       location.reload();
     }
 
-    let owners = [], patients = [], rxs = [], meds = [];
+    let owners = [], patients = [], meds = [];
 
-    function loadData() {
-      let key = "_" + currentDoctor.replace(/\s+/g, '_');
-      owners = JSON.parse(localStorage.getItem('owners' + key)) || [{id:"1", name:"أحمد محمد", phone:"01012345678", address:"القاهرة"}];
-      patients = JSON.parse(localStorage.getItem('patients' + key)) || [{id:"1", name:"Bella", type:"كلب", age:"سنتين", weight:"20 كجم", ownerName:"أحمد محمد"}];
-      rxs = JSON.parse(localStorage.getItem('rxs' + key)) || [];
-      meds = JSON.parse(localStorage.getItem('meds' + key)) || [{id:"m1", name:"Amoxicillin", price:150, qty:10}];
-      renderAll();
-    }
+    async function loadDataFromSupabase() {
+      try {
+        let ownersRes = await _supabase.from('owners').select('*');
+        if(ownersRes.data) owners = ownersRes.data;
 
-    function saveData() {
-      let key = "_" + currentDoctor.replace(/\s+/g, '_');
-      localStorage.setItem('owners' + key, JSON.stringify(owners));
-      localStorage.setItem('patients' + key, JSON.stringify(patients));
-      localStorage.setItem('rxs' + key, JSON.stringify(rxs));
-      localStorage.setItem('meds' + key, JSON.stringify(meds));
+        let patientsRes = await _supabase.from('animals').select('*');
+        if(patientsRes.data) patients = patientsRes.data;
+
+        let medsRes = await _supabase.from('Albaron vet').select('*');
+        if(medsRes.data) meds = medsRes.data;
+
+        renderAll();
+      } catch(err) {
+        console.error("خطأ في الاتصال بقاعدة البيانات:", err);
+      }
     }
 
     function openModal(modalId) {
@@ -400,169 +335,76 @@
       modalInstance.show();
     }
 
+    function closeModal(modalId) {
+      let modalElement = document.getElementById(modalId);
+      let modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if(modalInstance) modalInstance.hide();
+    }
+
     function renderAll() {
       document.getElementById('kpiPatients').innerText = patients.length;
       document.getElementById('kpiOwners').innerText = owners.length;
-      document.getElementById('kpiRx').innerText = rxs.length;
-      document.getElementById('kpiLowStock').innerText = meds.filter(m => m.qty <= 5).length;
+      document.getElementById('kpiRx').innerText = 0;
+      document.getElementById('kpiLowStock').innerText = 0;
 
       document.getElementById('ownersTable').innerHTML = owners.map(o => `
         <tr>
-          <td>${o.name}</td>
-          <td>${o.phone}</td>
-          <td>${o.address}</td>
-          <td>
-            <a href="https://wa.me/${o.phone}" target="_blank" class="btn btn-sm btn-success me-1"><i class="fa-brands fa-whatsapp"></i></a>
-            <button class="btn btn-sm btn-danger" onclick="deleteOwner('${o.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
+          <td>${o.name || ''}</td>
+          <td>${o.phone || ''}</td>
+          <td>${o.email || ''}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteRecord('owners', '${o.id}')">حذف</button></td>
         </tr>`).join('');
 
       document.getElementById('patientsTable').innerHTML = patients.map(p => `
         <tr>
-          <td>${p.name}</td>
-          <td>${p.type}</td>
-          <td>${p.age}</td>
-          <td>${p.weight}</td>
-          <td>${p.ownerName || '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-custom me-1" onclick="selectRx('${p.name}')">روشتة</button>
-            <button class="btn btn-sm btn-danger" onclick="deletePatient('${p.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
-        </tr>`).join('');
-      
-      document.getElementById('recentPatientsTable').innerHTML = patients.slice(-5).map(p => `
-        <tr>
-          <td>${p.name}</td>
-          <td>${p.type}</td>
-          <td>${p.ownerName || '-'}</td>
+          <td>${p.name || ''}</td>
+          <td>${p.type || ''}</td>
           <td>-</td>
-        </tr>`).join('');
-
-      document.getElementById('rxTable').innerHTML = rxs.map(r => `
-        <tr>
-          <td>${r.date}</td>
-          <td>${r.patientName || '-'}</td>
-          <td>${r.diagnosis}</td>
-          <td>
-            <button class="btn btn-sm btn-primary me-1" onclick="alert('الأدوية والجرعات:\\n${r.meds}')"><i class="fa-solid fa-eye"></i> عرض</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteRx('${r.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
-        </tr>`).join('');
-
-      document.getElementById('pharmacyTable').innerHTML = meds.map(m => `
-        <tr>
-          <td>${m.name}</td>
-          <td>${m.price} ج.م</td>
-          <td>${m.qty}</td>
-          <td>${m.qty <= 5 ? '<span class="badge bg-danger">منخفض</span>' : '<span class="badge bg-success">متوفر</span>'}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-danger me-1" onclick="updateQty('${m.id}', -1)">-</button> 
-            <button class="btn btn-sm btn-outline-success me-2" onclick="updateQty('${m.id}', 1)">+</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteMed('${m.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
+          <td>-</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteRecord('animals', '${p.id}')">حذف</button></td>
         </tr>`).join('');
     }
 
-    function deleteOwner(id) {
-      if(confirm('هل أنت متأكد من حذف هذا المالك؟')) {
-        owners = owners.filter(o => o.id !== id);
-        saveData(); renderAll();
+    async function saveOwnerDirect() {
+      let name = document.getElementById('ownerName').value.trim();
+      let phone = document.getElementById('ownerPhone').value.trim();
+      let address = document.getElementById('ownerAddress').value.trim();
+
+      const { data, error } = await _supabase.from('owners').insert([{ name, phone, email: address }]);
+      if(error) { alert("حدث خطأ أثناء الحفظ سحابياً"); } else {
+        alert("تم الحفظ في قاعدة البيانات بنجاح!");
+        closeModal('ownerModal');
+        loadDataFromSupabase();
       }
     }
 
-    function deletePatient(id) {
-      if(confirm('هل أنت متأكد من حذف هذه الحالة؟')) {
-        patients = patients.filter(p => p.id !== id);
-        saveData(); renderAll();
+    async function savePatientDirect() {
+      let name = document.getElementById('patName').value.trim();
+      let type = document.getElementById('patType').value.trim();
+
+      const { data, error } = await _supabase.from('animals').insert([{ name, type }]);
+      if(error) { alert("حدث خطأ أثناء الحفظ"); } else {
+        alert("تم حفظ الحالة بنجاح!");
+        closeModal('patientModal');
+        loadDataFromSupabase();
       }
     }
 
-    function deleteRx(id) {
-      if(confirm('هل أنت متأكد من حذف هذه الروشتة؟')) {
-        rxs = rxs.filter(r => r.id !== id);
-        saveData(); renderAll();
+    async function saveMedDirect() {
+      let name = document.getElementById('medNameInput').value.trim();
+      const { data, error } = await _supabase.from('Albaron vet').insert([{ name }]);
+      if(error) { alert("حدث خطأ"); } else {
+        alert("تم حفظ الدواء!");
+        closeModal('medModal');
+        loadDataFromSupabase();
       }
     }
 
-    function deleteMed(id) {
-      if(confirm('هل أنت متأكد من حذف هذا الدواء من المخزون؟')) {
-        meds = meds.filter(m => m.id !== id);
-        saveData(); renderAll();
+    async function deleteRecord(table, id) {
+      if(confirm('هل أنت متأكد من الحذف؟')) {
+        await _supabase.from(table).delete().eq('id', id);
+        loadDataFromSupabase();
       }
-    }
-
-    function updateQty(id, val) {
-      let m = meds.find(x => x.id == id);
-      if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
-    }
-
-    document.getElementById('ownerForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      owners.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('ownerName').value, 
-        phone: document.getElementById('ownerPhone').value, 
-        address: document.getElementById('ownerAddress').value
-      });
-      saveData(); 
-      renderAll();
-      let modalEl = document.getElementById('ownerModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
-
-    document.getElementById('patientForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      patients.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('patName').value, 
-        type: document.getElementById('patType').value, 
-        age: document.getElementById('patAge').value, 
-        weight: document.getElementById('patWeight').value, 
-        ownerName: document.getElementById('patOwnerInput').value
-      });
-      saveData(); 
-      renderAll();
-      let modalEl = document.getElementById('patientModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
-
-    document.getElementById('medForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      meds.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('medNameInput').value, 
-        price: Number(document.getElementById('medPriceInput').value), 
-        qty: Number(document.getElementById('medQtyInput').value)
-      });
-      saveData(); 
-      renderAll();
-      let modalEl = document.getElementById('medModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
-
-    document.getElementById('rxForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      rxs.push({
-        id: Date.now().toString(), 
-        patientName: document.getElementById('rxPatientName').value, 
-        diagnosis: document.getElementById('rxDiagnosis').value, 
-        meds: document.getElementById('rxMeds').value, 
-        date: new Date().toLocaleDateString()
-      });
-      saveData(); renderAll();
-      e.target.reset();
-      alert("تم حفظ الروشتة بنجاح!");
-    });
-
-    function selectRx(name) {
-      document.getElementById('link-rx').click();
-      document.getElementById('rxPatientName').value = name;
     }
   </script>
 </body>
