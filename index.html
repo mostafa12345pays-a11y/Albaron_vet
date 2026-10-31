@@ -44,7 +44,6 @@
   <div id="authScreen">
     <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 480px;">
       <div class="mb-3">
-        <!-- أيقونة احترافية بديلة للوجو لضمان عدم تعطل الصفحة أبداً -->
         <div class="d-inline-block">
           <i class="fa-solid fa-paw logo-icon shadow-sm"></i>
         </div>
@@ -247,8 +246,35 @@
     </div>
   </div>
 
-  <!-- Modal المالك -->
-  <div class="modal fade" id="ownerModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة مالك</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="ownerForm"><div class="mb-3"><label>الاسم</label><input type="text" class="form-control" id="ownerName" required></div><div class="mb-3"><label>الهاتف</label><input type="text" class="form-control" id="ownerPhone" required></div><div class="mb-3"><label>العنوان</label><input type="text" class="form-control" id="ownerAddress" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
+  <!-- Modal المالك (مع التحقق من تكرار الهاتف) -->
+  <div class="modal fade" id="ownerModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">إضافة مالك</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="ownerForm">
+            <div class="mb-3">
+              <label>الاسم</label>
+              <input type="text" class="form-control" id="ownerName" required>
+            </div>
+            <div class="mb-3">
+              <label>الهاتف</label>
+              <input type="text" class="form-control" id="ownerPhone" oninput="checkExistingOwner(this.value)" required>
+              <div id="ownerAlertMsg" class="form-text text-danger fw-bold mt-1" style="display: none;"></div>
+            </div>
+            <div class="mb-3">
+              <label>العنوان</label>
+              <input type="text" class="form-control" id="ownerAddress" required>
+            </div>
+            <button type="submit" class="btn btn-custom w-100">حفظ</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal الحيوان -->
   <div class="modal fade" id="patientModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">إضافة حالة</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="patientForm"><div class="mb-3"><label>اسم الحيوان</label><input type="text" class="form-control" id="patName" required></div><div class="mb-3"><label>النوع</label><input type="text" class="form-control" id="patType" required></div><div class="mb-3"><label>العمر</label><input type="text" class="form-control" id="patAge" required></div><div class="mb-3"><label>الوزن</label><input type="text" class="form-control" id="patWeight" required></div><div class="mb-3"><label>اسم المالك (اكتبه يدوياً)</label><input type="text" class="form-control" id="patOwnerInput" placeholder="مثال: أحمد محمد" required></div><button type="submit" class="btn btn-custom w-100">حفظ</button></form></div></div></div></div>
@@ -290,7 +316,6 @@
     let currentDoctor = localStorage.getItem('albaron_doc') || "";
     if (currentDoctor) startApp(currentDoctor);
 
-    // تسجيل الدخول بالبريد الإلكتروني
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let email = document.getElementById('loginEmail').value.trim();
@@ -303,11 +328,10 @@
         localStorage.setItem('albaron_doc', currentDoctor);
         startApp(currentDoctor);
       } else {
-        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة! تأكد من إنشاء الحساب أولاً إن لم تقم بذلك.");
+        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة!");
       }
     });
 
-    // إنشاء حساب جديد بالبريد الإلكتروني
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       let name = document.getElementById('regName').value.trim();
@@ -347,223 +371,3 @@
 
       document.getElementById('forgotStep1').style.display = 'none';
       document.getElementById('forgotStep2').style.display = 'block';
-    }
-
-    function verifyAndResetPassword() {
-      let enteredCode = document.getElementById('resetCodeInput').value.trim();
-      let newPass = document.getElementById('newPasswordInput').value.trim();
-
-      if(enteredCode === generatedOtp && newPass) {
-        resetTargetDoc.pass = newPass;
-        localStorage.setItem('albaron_all_docs', JSON.stringify(allDoctors));
-        alert("تم تغيير كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.");
-        switchTab('login');
-      } else {
-        alert("كود التحقق خاطئ أو كلمة المرور فارغة!");
-      }
-    }
-
-    function startApp(name) {
-      document.getElementById('authScreen').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
-      document.getElementById('currentDoctorName').innerText = name;
-      loadData();
-    }
-
-    function logoutDoctor() {
-      localStorage.removeItem('albaron_doc');
-      location.reload();
-    }
-
-    let owners = [], patients = [], rxs = [], meds = [];
-
-    function loadData() {
-      let key = "_" + currentDoctor.replace(/\s+/g, '_');
-      owners = JSON.parse(localStorage.getItem('owners' + key)) || [{id:"1", name:"أحمد محمد", phone:"01012345678", address:"القاهرة"}];
-      patients = JSON.parse(localStorage.getItem('patients' + key)) || [{id:"1", name:"Bella", type:"كلب", age:"سنتين", weight:"20 كجم", ownerName:"أحمد محمد"}];
-      rxs = JSON.parse(localStorage.getItem('rxs' + key)) || [];
-      meds = JSON.parse(localStorage.getItem('meds' + key)) || [{id:"m1", name:"Amoxicillin", price:150, qty:10}];
-      renderAll();
-    }
-
-    function saveData() {
-      let key = "_" + currentDoctor.replace(/\s+/g, '_');
-      localStorage.setItem('owners' + key, JSON.stringify(owners));
-      localStorage.setItem('patients' + key, JSON.stringify(patients));
-      localStorage.setItem('rxs' + key, JSON.stringify(rxs));
-      localStorage.setItem('meds' + key, JSON.stringify(meds));
-    }
-
-    function openModal(modalId) {
-      let modalElement = document.getElementById(modalId);
-      let modalInstance = new bootstrap.Modal(modalElement);
-      modalInstance.show();
-    }
-
-    function renderAll() {
-      document.getElementById('kpiPatients').innerText = patients.length;
-      document.getElementById('kpiOwners').innerText = owners.length;
-      document.getElementById('kpiRx').innerText = rxs.length;
-      document.getElementById('kpiLowStock').innerText = meds.filter(m => m.qty <= 5).length;
-
-      document.getElementById('ownersTable').innerHTML = owners.map(o => `
-        <tr>
-          <td>${o.name}</td>
-          <td>${o.phone}</td>
-          <td>${o.address}</td>
-          <td>
-            <a href="https://wa.me/${o.phone}" target="_blank" class="btn btn-sm btn-success me-1"><i class="fa-brands fa-whatsapp"></i></a>
-            <button class="btn btn-sm btn-danger" onclick="deleteOwner('${o.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
-        </tr>`).join('');
-
-      document.getElementById('patientsTable').innerHTML = patients.map(p => `
-        <tr>
-          <td>${p.name}</td>
-          <td>${p.type}</td>
-          <td>${p.age}</td>
-          <td>${p.weight}</td>
-          <td>${p.ownerName || '-'}</td>
-          <td>
-            <button class="btn btn-sm btn-custom me-1" onclick="selectRx('${p.name}')">روشتة</button>
-            <button class="btn btn-sm btn-danger" onclick="deletePatient('${p.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
-        </tr>`).join('');
-      
-      document.getElementById('recentPatientsTable').innerHTML = patients.slice(-5).map(p => `
-        <tr>
-          <td>${p.name}</td>
-          <td>${p.type}</td>
-          <td>${p.ownerName || '-'}</td>
-          <td>-</td>
-        </tr>`).join('');
-
-      document.getElementById('rxTable').innerHTML = rxs.map(r => `
-        <tr>
-          <td>${r.date}</td>
-          <td>${r.patientName || '-'}</td>
-          <td>${r.diagnosis}</td>
-          <td>
-            <button class="btn btn-sm btn-primary me-1" onclick="alert('الأدوية والجرعات:\\n${r.meds}')"><i class="fa-solid fa-eye"></i> عرض</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteRx('${r.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
-        </tr>`).join('');
-
-      document.getElementById('pharmacyTable').innerHTML = meds.map(m => `
-        <tr>
-          <td>${m.name}</td>
-          <td>${m.price} ج.م</td>
-          <td>${m.qty}</td>
-          <td>${m.qty <= 5 ? '<span class="badge bg-danger">منخفض</span>' : '<span class="badge bg-success">متوفر</span>'}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-danger me-1" onclick="updateQty('${m.id}', -1)">-</button> 
-            <button class="btn btn-sm btn-outline-success me-2" onclick="updateQty('${m.id}', 1)">+</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteMed('${m.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-          </td>
-        </tr>`).join('');
-    }
-
-    function deleteOwner(id) {
-      if(confirm('هل أنت متأكد من حذف هذا المالك؟')) {
-        owners = owners.filter(o => o.id !== id);
-        saveData(); renderAll();
-      }
-    }
-
-    function deletePatient(id) {
-      if(confirm('هل أنت متأكد من حذف هذه الحالة؟')) {
-        patients = patients.filter(p => p.id !== id);
-        saveData(); renderAll();
-      }
-    }
-
-    function deleteRx(id) {
-      if(confirm('هل أنت متأكد من حذف هذه الروشتة؟')) {
-        rxs = rxs.filter(r => r.id !== id);
-        saveData(); renderAll();
-      }
-    }
-
-    function deleteMed(id) {
-      if(confirm('هل أنت متأكد من حذف هذا الدواء من المخزون؟')) {
-        meds = meds.filter(m => m.id !== id);
-        saveData(); renderAll();
-      }
-    }
-
-    function updateQty(id, val) {
-      let m = meds.find(x => x.id == id);
-      if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
-    }
-
-    document.getElementById('ownerForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      owners.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('ownerName').value, 
-        phone: document.getElementById('ownerPhone').value, 
-        address: document.getElementById('ownerAddress').value
-      });
-      saveData(); 
-      renderAll();
-      let modalEl = document.getElementById('ownerModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
-
-    document.getElementById('patientForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      patients.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('patName').value, 
-        type: document.getElementById('patType').value, 
-        age: document.getElementById('patAge').value, 
-        weight: document.getElementById('patWeight').value, 
-        ownerName: document.getElementById('patOwnerInput').value
-      });
-      saveData(); 
-      renderAll();
-      let modalEl = document.getElementById('patientModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
-
-    document.getElementById('medForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      meds.push({
-        id: Date.now().toString(), 
-        name: document.getElementById('medNameInput').value, 
-        price: Number(document.getElementById('medPriceInput').value), 
-        qty: Number(document.getElementById('medQtyInput').value)
-      });
-      saveData(); 
-      renderAll();
-      let modalEl = document.getElementById('medModal');
-      let modalObj = bootstrap.Modal.getInstance(modalEl);
-      if(modalObj) modalObj.hide();
-      e.target.reset();
-    });
-
-    document.getElementById('rxForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      rxs.push({
-        id: Date.now().toString(), 
-        patientName: document.getElementById('rxPatientName').value, 
-        diagnosis: document.getElementById('rxDiagnosis').value, 
-        meds: document.getElementById('rxMeds').value, 
-        date: new Date().toLocaleDateString()
-      });
-      saveData(); renderAll();
-      e.target.reset();
-      alert("تم حفظ الروشتة بنجاح!");
-    });
-
-    function selectRx(name) {
-      document.getElementById('link-rx').click();
-      document.getElementById('rxPatientName').value = name;
-    }
-  </script>
-</body>
-</html>
