@@ -50,7 +50,7 @@
         <p class="text-muted small">نظام إدارة العيادات البيطرية المخصص</p>
       </div>
 
-      <!-- أزرار التبديل الواضحة -->
+      <!-- أزرار التبديل (ترتيب صحيح: تسجيل الدخول أولاً ثم إنشاء حساب) -->
       <div class="d-flex gap-2 w-100 mb-3">
         <button type="button" class="btn btn-dark flex-fill fw-bold" id="tabBtnLogin" onclick="switchAuthTab('login')">تسجيل الدخول</button>
         <button type="button" class="btn btn-outline-dark flex-fill fw-bold" id="tabBtnRegister" onclick="switchAuthTab('register')">إنشاء حساب جديد</button>
@@ -347,4 +347,122 @@
       let pass = document.getElementById('loginPassword').value.trim();
 
       if(!email || !pass) {
-        alert("يرجى إ
+        alert("يرجى إدخال البريد الإلكتروني وكلمة المرور!");
+        return;
+      }
+
+      let foundDoc = allDoctors.find(d => d.email.toLowerCase() === email && d.pass === pass);
+      
+      if(foundDoc) {
+        currentDoctor = foundDoc.name;
+        localStorage.setItem('albaron_doc', currentDoctor);
+        startApp(currentDoctor);
+      } else {
+        alert("خطأ: البريد الإلكتروني أو كلمة المرور غير صحيحة!");
+      }
+    }
+
+    // إنشاء حساب جديد
+    function handleRegister() {
+      let name = document.getElementById('regName').value.trim();
+      let email = document.getElementById('regEmail').value.trim().toLowerCase();
+      let pass = document.getElementById('regPassword').value.trim();
+
+      if(!name || !email || !pass) {
+        alert("يرجى تعبئة جميع الحقول لإنشاء الحساب!");
+        return;
+      }
+
+      if(allDoctors.some(d => d.email.toLowerCase() === email)) {
+        alert("البريد الإلكتروني مسجل مسبقاً!");
+        return;
+      }
+
+      allDoctors.push({ name, email, pass });
+      localStorage.setItem('albaron_all_docs', JSON.stringify(allDoctors));
+      
+      currentDoctor = name;
+      localStorage.setItem('albaron_doc', currentDoctor);
+      startApp(currentDoctor);
+    }
+
+    let generatedOtp = "";
+    let resetTargetDoc = null;
+
+    function sendResetCode() {
+      let emailInput = document.getElementById('forgotEmail').value.trim().toLowerCase();
+      let doc = allDoctors.find(d => d.email.toLowerCase() === emailInput);
+
+      if(!doc) {
+        alert("البريد الإلكتروني غير مسجل لدينا!");
+        return;
+      }
+
+      resetTargetDoc = doc;
+      generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+      
+      document.getElementById('displayOtpCode').innerText = generatedOtp;
+      document.getElementById('forgotStep1').style.display = 'none';
+      document.getElementById('forgotStep2').style.display = 'block';
+    }
+
+    function verifyAndResetPassword() {
+      let enteredCode = document.getElementById('resetCodeInput').value.trim();
+      let newPass = document.getElementById('newPasswordInput').value.trim();
+
+      if(enteredCode === generatedOtp && newPass) {
+        resetTargetDoc.pass = newPass;
+        localStorage.setItem('albaron_all_docs', JSON.stringify(allDoctors));
+        alert("تم تغيير كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.");
+        switchAuthTab('login');
+      } else {
+        alert("كود التحقق خاطئ أو كلمة المرور فارغة!");
+      }
+    }
+
+    function startApp(name) {
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      document.getElementById('currentDoctorName').innerText = name;
+      loadData();
+    }
+
+    function logoutDoctor() {
+      localStorage.removeItem('albaron_doc');
+      location.reload();
+    }
+
+    let owners = [], patients = [], rxs = [], meds = [];
+
+    function loadData() {
+      let key = "_" + currentDoctor.replace(/\s+/g, '_');
+      owners = JSON.parse(localStorage.getItem('owners' + key)) || [{id:"1", name:"أحمد محمد", phone:"01012345678", address:"القاهرة"}];
+      patients = JSON.parse(localStorage.getItem('patients' + key)) || [{id:"1", name:"Bella", type:"كلب", age:"سنتين", weight:"20 كجم", ownerName:"أحمد محمد"}];
+      rxs = JSON.parse(localStorage.getItem('rxs' + key)) || [];
+      meds = JSON.parse(localStorage.getItem('meds' + key)) || [{id:"m1", name:"Amoxicillin", price:150, qty:10}];
+      renderAll();
+    }
+
+    function saveData() {
+      let key = "_" + currentDoctor.replace(/\s+/g, '_');
+      localStorage.setItem('owners' + key, JSON.stringify(owners));
+      localStorage.setItem('patients' + key, JSON.stringify(patients));
+      localStorage.setItem('rxs' + key, JSON.stringify(rxs));
+      localStorage.setItem('meds' + key, JSON.stringify(meds));
+    }
+
+    function openModal(modalId) {
+      let modalElement = document.getElementById(modalId);
+      let modalInstance = new bootstrap.Modal(modalElement);
+      modalInstance.show();
+      if(modalId === 'ownerModal') {
+        document.getElementById('ownerAlertMsg').style.display = 'none';
+        document.getElementById('ownerName').value = '';
+        document.getElementById('ownerPhone').value = '';
+        document.getElementById('ownerAddress').value = '';
+      }
+    }
+
+    function checkExistingOwner(phoneVal) {
+      let alertBox = document.getElementById('ownerAlertMsg');
+      let trimmed
