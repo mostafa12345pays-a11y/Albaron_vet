@@ -28,7 +28,7 @@
       background: linear-gradient(135deg, #005b66 0%, #003d45 100%);
     }
     .app-logo {
-      max-height: 80px;
+      max-height: 90px;
       object-fit: contain;
     }
     .navbar-logo {
@@ -39,33 +39,50 @@
 </head>
 <body>
 
-  <!-- شاشة تسجيل الدخول مع اللوجو -->
+  <!-- شاشة تسجيل الدخول والترحيب مع اللوجو -->
   <div id="authScreen">
-    <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 450px;">
+    <div class="card card-kpi p-4 shadow-lg text-center" style="width: 100%; max-width: 480px;">
       <div class="mb-3">
+        <!-- عرض اللوجو الذي قمت بإرساله -->
         <img src="logo.png" alt="Albaron Vet Logo" class="app-logo mb-2" onerror="this.style.display='none'">
         <h3 style="color: var(--primary);" class="fw-bold"><i class="fa-solid fa-paw me-2"></i>Albaron Vet</h3>
-        <p class="text-muted">نظام إدارة العيادات البيطرية المخصص</p>
-      </div>
-      
-      <div class="mb-3 text-start">
-        <label class="form-label fw-bold">اختر حساباً مسجلاً مسبقاً</label>
-        <select class="form-select" id="savedDoctorsSelect" onchange="selectSavedDoctor(this.value)">
-          <option value="">-- حساب جديد (إنشاء حساب) --</option>
-        </select>
+        <p class="text-muted small">نظام إدارة العيادات البيطرية المخصص</p>
       </div>
 
-      <form id="authForm" class="text-start">
-        <div class="mb-3">
-          <label class="form-label fw-bold">اسم الطبيب / العيادة</label>
-          <input type="text" class="form-control" id="authName" placeholder="مثال: د. أحمد" required>
-        </div>
-        <div class="mb-3">
-          <label class="form-label fw-bold">رقم الهاتف أو البريد</label>
-          <input type="text" class="form-control" id="authContact" placeholder="مثال: 01012345678" required>
-        </div>
-        <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5">دخول للنظام</button>
-      </form>
+      <!-- أزرار التبديل بين تسجيل الدخول أو إنشاء حساب جديد -->
+      <div class="btn-group w-100 mb-4" role="group">
+        <button type="button" class="btn btn-outline-dark active fw-bold" id="btnTabLogin" onclick="switchAuthMode('login')">تسجيل الدخول (حساب سابق)</button>
+        <button type="button" class="btn btn-outline-dark fw-bold" id="btnTabRegister" onclick="switchAuthMode('register')">إنشاء حساب جديد</button>
+      </div>
+
+      <!-- نموذج تسجيل الدخول للحسابات السابقة -->
+      <div id="loginSection">
+        <form id="loginForm">
+          <div class="mb-3 text-start">
+            <label class="form-label fw-bold">اختر الحساب المسجل</label>
+            <select class="form-select" id="savedDoctorsSelect" required onchange="fillDoctorData(this.value)">
+              <option value="">-- اختر حسابك من القائمة --</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5">دخول إلى النظام</button>
+        </form>
+      </div>
+
+      <!-- نموذج إنشاء حساب جديد -->
+      <div id="registerSection" style="display: none;">
+        <form id="registerForm">
+          <div class="mb-3 text-start">
+            <label class="form-label fw-bold">اسم الطبيب / العيادة الجديد</label>
+            <input type="text" class="form-control" id="regName" placeholder="مثال: د. أحمد محمد" required>
+          </div>
+          <div class="mb-3 text-start">
+            <label class="form-label fw-bold">رقم الهاتف أو البريد الإلكتروني</label>
+            <input type="text" class="form-control" id="regContact" placeholder="مثال: 01012345678" required>
+          </div>
+          <button type="submit" class="btn btn-custom w-100 py-2 fw-bold fs-5">إنشاء وحفظ الحساب</button>
+        </form>
+      </div>
+
     </div>
   </div>
 
@@ -205,33 +222,52 @@
     
     function populateSavedDoctors() {
       let select = document.getElementById('savedDoctorsSelect');
-      select.innerHTML = '<option value="">-- حساب جديد (إنشاء حساب) --</option>';
+      select.innerHTML = '<option value="">-- اختر حسابك من القائمة --</option>';
       allDoctors.forEach(doc => {
         select.innerHTML += `<option value="${doc.name}">${doc.name} (${doc.contact})</option>`;
       });
     }
     populateSavedDoctors();
 
-    function selectSavedDoctor(name) {
-      if(name) {
-        let doc = allDoctors.find(d => d.name === name);
-        if(doc) {
-          document.getElementById('authName').value = doc.name;
-          document.getElementById('authContact').value = doc.contact;
-        }
+    let selectedLoginDoctor = "";
+    function fillDoctorData(name) {
+      selectedLoginDoctor = name;
+    }
+
+    function switchAuthMode(mode) {
+      if(mode === 'login') {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('registerSection').style.display = 'none';
+        document.getElementById('btnTabLogin').classList.add('active');
+        document.getElementById('btnTabRegister').classList.remove('active');
       } else {
-        document.getElementById('authName').value = '';
-        document.getElementById('authContact').value = '';
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('registerSection').style.display = 'block';
+        document.getElementById('btnTabRegister').classList.add('active');
+        document.getElementById('btnTabLogin').classList.remove('active');
       }
     }
 
     let currentDoctor = localStorage.getItem('albaron_doc') || "";
     if (currentDoctor) startApp(currentDoctor);
 
-    document.getElementById('authForm').addEventListener('submit', (e) => {
+    // نموذج تسجيل الدخول
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      let name = document.getElementById('authName').value.trim();
-      let contact = document.getElementById('authContact').value.trim();
+      if(selectedLoginDoctor) {
+        currentDoctor = selectedLoginDoctor;
+        localStorage.setItem('albaron_doc', currentDoctor);
+        startApp(currentDoctor);
+      } else {
+        alert("الرجاء اختيار حساب مسجل أولاً أو إنشاء حساب جديد.");
+      }
+    });
+
+    // نموذج إنشاء حساب جديد
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let name = document.getElementById('regName').value.trim();
+      let contact = document.getElementById('regContact').value.trim();
       if(name && contact) {
         currentDoctor = name;
         localStorage.setItem('albaron_doc', currentDoctor);
