@@ -456,13 +456,23 @@
 
     function openModal(modalId) {
       let modalElement = document.getElementById(modalId);
-      let modalInstance = new bootstrap.Modal(modalElement);
+      let modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
       modalInstance.show();
       if(modalId === 'ownerModal') {
         document.getElementById('ownerAlertMsg').style.display = 'none';
         document.getElementById('ownerName').value = '';
         document.getElementById('ownerPhone').value = '';
         document.getElementById('ownerAddress').value = '';
+      } else if(modalId === 'patientModal') {
+        document.getElementById('patName').value = '';
+        document.getElementById('patType').value = '';
+        document.getElementById('patAge').value = '';
+        document.getElementById('patWeight').value = '';
+        document.getElementById('patOwnerInput').value = '';
+      } else if(modalId === 'medModal') {
+        document.getElementById('medNameInput').value = '';
+        document.getElementById('medPriceInput').value = '';
+        document.getElementById('medQtyInput').value = '';
       }
     }
 
@@ -582,7 +592,7 @@
       if(m) { m.qty += val; if(m.qty < 0) m.qty = 0; saveData(); renderAll(); }
     }
 
-    // حفظ المالك وإغلاق النافذة بشكل صحيح
+    // حفظ المالك وإغلاق النافذة بنجاح
     function saveOwnerDirect() {
       let name = document.getElementById('ownerName').value.trim();
       let phone = document.getElementById('ownerPhone').value.trim();
@@ -602,6 +612,7 @@
       if(modalObj) modalObj.hide();
     }
 
+    // حفظ الحالة وإغلاق النافذة بنجاح
     function savePatientDirect() {
       let name = document.getElementById('patName').value.trim();
       let type = document.getElementById('patType').value.trim();
@@ -623,6 +634,7 @@
       if(modalObj) modalObj.hide();
     }
 
+    // حفظ الدواء وإغلاق النافذة بنجاح
     function saveMedDirect() {
       let name = document.getElementById('medNameInput').value.trim();
       let price = Number(document.getElementById('medPriceInput').value);
